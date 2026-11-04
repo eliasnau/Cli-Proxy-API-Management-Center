@@ -31,13 +31,7 @@ export function ProviderCategoryList({ groups, activeBrand, onSelect }: Provider
         const total = group.resources.length;
         const activeCount = group.resources.filter((r) => !r.disabled).length;
         const logo = PROVIDER_LOGOS[group.id];
-        const itemClass = [
-          styles.item,
-          active ? styles.active : '',
-          group.id === 'kimi' ? styles.itemKimi : '',
-        ]
-          .filter(Boolean)
-          .join(' ');
+        const itemClass = active ? `${styles.item} ${styles.active}` : styles.item;
         const logoClassName = [
           styles.logo,
           logo?.transparent ? styles.logoTransparent : '',
@@ -78,27 +72,20 @@ export function ProviderCategoryList({ groups, activeBrand, onSelect }: Provider
                   ) : null}
                 </>
               ) : null}
-              <span className={styles.itemText}>
-                <span className={styles.itemTitle}>
-                  {t(`providersPage.providerNames.${group.id}`)}
-                </span>
-                <span className={styles.itemSubtitle}>
-                  {t('providersPage.categories.activeCount', {
-                    active: activeCount,
-                    total,
-                  })}
-                </span>
+              <span className={styles.itemTitle}>
+                {t(`providersPage.providerNames.${group.id}`)}
               </span>
             </span>
             <span
-              className={[
-                styles.badge,
-                total === 0 ? (group.id === 'kimi' ? styles.badgeKimi : styles.badgeAmber) : '',
-              ]
+              className={[styles.badge, total === 0 ? styles.badgeEmpty : '']
                 .filter(Boolean)
                 .join(' ')}
+              title={t('providersPage.categories.activeCount', {
+                active: activeCount,
+                total,
+              })}
             >
-              {total}
+              {activeCount === total ? total : `${activeCount}/${total}`}
             </span>
           </button>
         );
@@ -107,17 +94,15 @@ export function ProviderCategoryList({ groups, activeBrand, onSelect }: Provider
   );
 
   return (
-    <div className={styles.stack}>
-      <aside className={styles.aside}>
-        <p className={styles.eyebrow}>{t('providersPage.categories.title')}</p>
-        {renderGroups(providerGroups)}
-      </aside>
+    <nav className={styles.stack} aria-label={t('providersPage.categories.title')}>
+      <p className={styles.label}>{t('providersPage.categories.title')}</p>
+      {renderGroups(providerGroups)}
       {quickFillGroups.length > 0 && (
-        <aside className={styles.aside}>
-          <p className={styles.eyebrow}>{t('providersPage.categories.quickFill')}</p>
+        <>
+          <p className={styles.label}>{t('providersPage.categories.quickFill')}</p>
           {renderGroups(quickFillGroups)}
-        </aside>
+        </>
       )}
-    </div>
+    </nav>
   );
 }

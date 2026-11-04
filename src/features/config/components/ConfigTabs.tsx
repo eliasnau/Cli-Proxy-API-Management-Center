@@ -2,7 +2,6 @@ import { useEffect, useRef, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { prefersReducedMotion } from '@/hooks/motion';
 import {
-  CONFIG_TAB_ICONS,
   CONFIG_TAB_IDS,
   configPanelDomId,
   configTabDomId,
@@ -21,7 +20,7 @@ export type ConfigTabsProps = {
 };
 
 /**
- * 分区 tabs：安静的下划线式（与提供商 tabs 同语汇），图标 + 标签 + 错误徽章 + 脏点。
+ * 分区 tabs：小号下划线文字 tabs（与 @/components/page Tabs 同语汇），标签 + 错误徽章 + 脏点。
  * 「常用」是首 tab；tab 切换是高频操作，零动画。
  */
 export function ConfigTabs({
@@ -71,7 +70,6 @@ export function ConfigTabs({
       ref={listRef}
     >
       {CONFIG_TAB_IDS.map((id) => {
-        const Icon = CONFIG_TAB_ICONS[id];
         const isActive = active === id;
         const errorCount = errorCounts[id] ?? 0;
         const isDirty = dirtyTabs.has(id);
@@ -102,7 +100,6 @@ export function ConfigTabs({
             onClick={() => onChange(id)}
             onKeyDown={handleKeyDown}
           >
-            <Icon size={15} className={styles.tabGlyph} />
             <span className={styles.tabLabel}>{tabLabel}</span>
             {errorCount > 0 ? (
               <span className={styles.tabBadge} aria-hidden="true">

@@ -7,7 +7,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
   min-width: 0;
   /* 底部为悬浮批量条留出实时高度 */
@@ -21,27 +21,41 @@
 .workbench {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
 }
 
-.errorBanner {
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--danger-color);
-  background: var(--bg-error-light);
-  border: 1px solid var(--warning-border);
-  border-radius: 10px;
-  padding: 9px 12px;
-  overflow-wrap: anywhere;
+/* Embedded in Accounts: header actions only, right-aligned. */
+.embeddedToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.iconTextButton > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spinning {
+  animation: auth-files-spin 0.8s linear infinite;
+}
+
+@keyframes auth-files-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ---------- 卡片网格 ---------- */
 
 .grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   align-items: stretch;
 }
 
@@ -53,7 +67,7 @@
    值与 .grid 相同但**必须保留且排在 .gridCompact 之后**：三个类同时挂在网格上，
    同specificity 靠源序决胜，删掉这条会让「紧凑 + 配额」从 340 掉回 260。 */
 .gridQuota {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
 }
 
 .emptyActions {
@@ -70,16 +84,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .pageInfo {
-  font-family: $font-mono;
-  font-size: 12px;
+  font-size: 12.5px;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
@@ -87,7 +99,7 @@
 
 .configGrid {
   display: grid;
-  gap: 16px;
+  gap: 12px;
   grid-template-columns: minmax(0, 1fr);
 
   @media (min-width: 1024px) {
@@ -95,8 +107,8 @@
   }
 }
 
-@include mobile {
-  .page {
-    gap: 16px;
+@media (prefers-reduced-motion: reduce) {
+  .spinning {
+    animation: none;
   }
 }

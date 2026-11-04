@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/Button';
 import { IconExternalLink, IconPlus, IconSearch } from '@/components/ui/icons';
 import type { ProviderRecentUsageMap } from '@/components/providers/utils';
 import { PROVIDER_LOGOS } from '../brandLogos';
@@ -98,7 +99,7 @@ export function ProviderResourcePanel({
       ) : null}
       <h2 className={styles.title}>{providerTitle}</h2>
       {showSponsorDashboardLink ? (
-        <IconExternalLink className={styles.titleExternalIcon} size={16} />
+        <IconExternalLink className={styles.titleExternalIcon} size={14} />
       ) : null}
     </>
   );
@@ -131,24 +132,18 @@ export function ProviderResourcePanel({
                 <span className={styles.sponsorLinkText}>
                   {t('providersPage.sponsor.dashboardLink')}
                 </span>
-                <IconExternalLink className={styles.sponsorLinkIcon} size={14} />
+                <IconExternalLink className={styles.sponsorLinkIcon} size={12} />
               </a>
             ) : registrationUrl ? (
               <>
                 <a
-                  className={[
-                    styles.sponsorLink,
-                    styles.sponsorLinkEmphasis,
-                    group.id === 'kimi' ? styles.sponsorLinkKimi : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
+                  className={styles.sponsorLink}
                   href={registrationUrl}
                   target="_blank"
                   rel="noreferrer"
                 >
                   <span className={styles.sponsorLinkText}>{registrationLabel}</span>
-                  <IconExternalLink className={styles.sponsorLinkIcon} size={14} />
+                  <IconExternalLink className={styles.sponsorLinkIcon} size={12} />
                 </a>
                 {group.id === 'kimi' ? (
                   <p className={styles.kimiPromo}>{t('providersPage.sponsor.kimiPromo')}</p>
@@ -158,7 +153,7 @@ export function ProviderResourcePanel({
           </div>
           <div className={styles.searchWrap}>
             <span className={styles.searchIcon} aria-hidden="true">
-              <IconSearch size={16} />
+              <IconSearch size={14} />
             </span>
             <input
               type="search"
@@ -187,25 +182,28 @@ export function ProviderResourcePanel({
 
       {filteredResources.length === 0 ? (
         <div className={styles.empty}>
-          <div>{emptyText}</div>
-          <div className={styles.emptyAction}>
-            {showSponsorRegistrationLink ? (
-              <a
-                className={`${styles.emptyActionButton} ${styles.emptyActionButtonEmphasis}`}
-                href={APIKEY_FUN_AFFILIATE_URL}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <IconExternalLink size={16} />
-                <span>{t('providersPage.sponsor.registerLink')}</span>
-              </a>
-            ) : (
-              <button type="button" className={styles.emptyActionButton} onClick={onCreate}>
-                <IconPlus size={16} />
-                <span>{t('providersPage.actions.new')}</span>
-              </button>
-            )}
-          </div>
+          <p className={styles.emptyText}>{emptyText}</p>
+          {showSponsorRegistrationLink ? (
+            <a
+              className={styles.emptyLink}
+              href={APIKEY_FUN_AFFILIATE_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span>{t('providersPage.sponsor.registerLink')}</span>
+              <IconExternalLink size={12} />
+            </a>
+          ) : (
+            <Button
+              variant="secondary"
+              size="sm"
+              className={styles.iconTextButton}
+              onClick={onCreate}
+            >
+              <IconPlus size={14} />
+              {t('providersPage.actions.new')}
+            </Button>
+          )}
         </div>
       ) : (
         <ProviderResourceTable

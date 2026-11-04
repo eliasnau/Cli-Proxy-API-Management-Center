@@ -100,6 +100,7 @@
     "status": "Статус подключения:"
   },
   "nav": {
+    "accounts": "Аккаунты",
     "dashboard": "Панель",
     "quick_start": "Быстрый старт",
     "ai_providers": "Поставщики AI",
@@ -115,12 +116,15 @@
     "devices": "Использование"
   },
   "nav_groups": {
+    "primary": "Навигация",
+    "more": "Ещё",
     "operate": "Работа",
     "gateway": "Шлюз",
     "observe": "Наблюдение",
     "control": "Управление"
   },
   "nav_meta": {
+    "accounts": "Провайдеры, файлы авторизации и OAuth",
     "dashboard": "Обзор работы",
     "quick_start": "Настройка APIKEY.FUN",
     "ai_providers": "Маршрутизация моделей",
@@ -136,6 +140,20 @@
     "devices": "Ключи и лимиты"
   },
   "dashboard": {
+    "routing_title": "Routing",
+    "routing_open": "Open routing",
+    "routing_saved": "Routing settings saved",
+    "routing_save_failed": "Could not save routing settings",
+    "routing_load_failed": "Could not load routing settings",
+    "devices_title": "Devices",
+    "devices_open": "Open usage",
+    "devices_empty": "No device keys yet. Add one on the Usage page.",
+    "devices_load_failed": "Could not load devices",
+    "devices_all_access": "All accounts",
+    "devices_disabled": "Disabled",
+    "devices_spend": "{{spent}} of {{limit}}",
+    "devices_spend_unlimited": "{{spent}} · no limit",
+    "devices_spend_aria": "Monthly spend of {{name}}",
     "hero_verdict_good": "Всё стабильно",
     "hero_verdict_warning": "Небольшие сбои",
     "hero_verdict_critical": "Требует внимания",
@@ -221,6 +239,18 @@
     "routing_strategy_round_robin": "round-robin (цикл)",
     "routing_strategy_weighted_round_robin": "weighted-round-robin (взвешенный цикл)",
     "routing_strategy_fill_first": "fill-first (приоритет)"
+  },
+  "accounts": {
+    "title": "Аккаунты",
+    "subtitle": "Подключённые аккаунты провайдеров, OAuth-учётные данные и API-ключи",
+    "add": "Добавить аккаунт",
+    "tab_auth_files": "Файлы авторизации",
+    "tab_providers": "API-провайдеры",
+    "tab_add": "Добавить аккаунт",
+    "add_oauth_title": "Вход через OAuth",
+    "add_file_hint": "Уже есть JSON-файл учётных данных? Загрузите его.",
+    "add_provider_hint": "Используете API-ключ? Добавьте его как API-провайдера.",
+    "add_provider_action": "Добавить API-провайдера"
   },
   "auth_files": {
     "title": "Управление файлами авторизации",
@@ -2421,6 +2451,31 @@
     "expired": "Сеанс привязки истёк. Начните заново."
   },
   "devices": {
+    "access_title": "Access",
+    "access_hint": "Choose which subscriptions may serve this device. Requests are only routed; nothing sent upstream changes.",
+    "access_providers": "Providers",
+    "access_all_providers": "All",
+    "access_accounts": "Specific accounts",
+    "access_any_account": "Any account",
+    "access_selected": "{{count}} selected",
+    "access_loading": "Loading accounts...",
+    "access_load_failed": "Could not load accounts",
+    "access_no_accounts": "No accounts available",
+    "access_account_off": "disabled",
+    "access_models": "Allowed models",
+    "access_models_hint": "Optional. Comma separated, * wildcards allowed. Empty allows every model.",
+    "access_badge_only": "{{provider}} only",
+    "access_badge_accounts_one": "{{count}} account",
+    "access_badge_accounts_other": "{{count}} accounts",
+    "access_badge_models_one": "{{count}} model rule",
+    "access_badge_models_other": "{{count}} model rules",
+    "access_detail_providers": "Providers: {{list}}",
+    "access_detail_accounts": "Accounts: {{list}}",
+    "access_detail_models": "Models: {{list}}",
+    "access_badge_accounts_few": "{{count}} accounts",
+    "access_badge_accounts_many": "{{count}} accounts",
+    "access_badge_models_few": "{{count}} model rules",
+    "access_badge_models_many": "{{count}} model rules",
     "title": "Использование",
     "description": "Give each device its own API key and cap how much it can spend per month. Upstream requests are unchanged.",
     "add": "Add device",

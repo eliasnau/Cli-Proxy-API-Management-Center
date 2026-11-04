@@ -6,7 +6,8 @@ import { useAuthStore, useThemeStore } from '@/stores';
 import iconVertex from '@/assets/icons/vertex.svg';
 import iconCodex from '@/assets/icons/codex.svg';
 import { KIMI_DISPLAY_NAME } from '@/features/providers/kimi';
-import { OAuthHeader } from './components/OAuthHeader';
+import { Button } from '@/components/ui/Button';
+import { Notice, PageHeader } from '@/components/page';
 import { ProviderTile } from './components/ProviderTile';
 import { SponsorCard, type SponsorCardSite } from './components/SponsorCard';
 import { OAuthFlowDialog, type DialogHeading } from './components/OAuthFlowDialog';
@@ -39,7 +40,14 @@ type DialogTarget = { kind: 'oauth'; id: string } | { kind: 'vertex' };
  * 点磁贴即开始登录；对话框可随时关闭，授权在后台继续，磁贴副行实时反映进度。
  * 对话框关闭后保留最后一个目标，让退出动画期间内容不消失。
  */
-export function OAuthPage() {
+export interface OAuthPageProps {
+  /** Rendered inside another page (Accounts): no own PageHeader title. */
+  embedded?: boolean;
+  /** Where "view auth files" goes after a login. Defaults to navigating to /auth-files. */
+  onViewAuthFiles?: () => void;
+}
+
+export function OAuthPage({ embedded = false, onViewAuthFiles }: OAuthPageProps = {}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const apiBase = useAuthStore((state) => state.apiBase);
@@ -135,11 +143,10 @@ export function OAuthPage() {
     setDialogOpen(false);
   };
 
-  const viewAuthFiles = () => navigate('/auth-files');
+  const viewAuthFiles = () => (onViewAuthFiles ? onViewAuthFiles() : navigate('/auth-files'));
 
   const dialogCard =
     dialog?.kind === 'oauth' ? providerCards.find((card) => card.id === dialog.id) : undefined;
-  const providerCount = providerCards.length;
   const sponsorCards = providerCards.filter(isSponsor);
   const regularCards = providerCards.filter((card) => !isSponsor(card));
   // 赞助商卡占级联的第 0 位，其余磁贴顺延
@@ -173,17 +180,20 @@ export function OAuthPage() {
       />
     );
   };
-  const waitingCount = Object.values(flows.states).filter(
-    (state) => state.status === 'waiting'
-  ).length;
-
   return (
     <div className={styles.page} ref={revealRef}>
-      <OAuthHeader
-        providerCount={providerCount}
-        waitingCount={waitingCount}
-        addedCount={flows.addedCount}
-      />
+      {embedded ? null : <PageHeader title={t('nav.oauth', { defaultValue: 'OAuth' })} />}
+      {flows.addedCount > 0 && (
+        <Notice
+          action={
+            <Button variant="ghost" size="sm" onClick={viewAuthFiles}>
+              {t('auth_login.view_auth_files')}
+            </Button>
+          }
+        >
+          {t('auth_login.meta_added', { count: flows.addedCount })}
+        </Notice>
+      )}
 
       {/* 赞助商独占首行：一张品牌卡收拢两站入口，其余提供商在下方紧凑网格 */}
       {sponsorCards.length > 0 && (

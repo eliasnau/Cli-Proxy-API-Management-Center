@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { animate } from 'motion/mini';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { Button } from '@/components/ui/Button';
 import { IconCheck } from '@/components/ui/icons';
 import { prefersReducedMotion } from '@/hooks/motion';
 import { useActionBarHeightVar } from '@/hooks/useActionBarHeightVar';
@@ -27,7 +27,7 @@ export type FloatingSaveBarProps = {
 };
 
 /**
- * 悬浮保存栏：portal 到 body 的玻璃工具栏，仅在 dirty 时出现。
+ * 悬浮保存栏：portal 到 body 的扁平小工具栏，仅在 dirty 时出现。
  * - 上浮入场 0.28s 强减速，退场 0.22s 加速后卸载；
  * - reduced-motion 只做透明度淡入淡出（保留 translateX(-50%)，防止错位半宽）；
  * - 实时高度写入 --config-action-bar-height 供页面底部留白。
@@ -145,23 +145,13 @@ export function FloatingSaveBar(props: FloatingSaveBarProps) {
           {statusText}
         </span>
         <div className={styles.actionsGroup}>
-          <button
-            type="button"
-            className={styles.ghostAction}
-            onClick={onDiscard}
-            disabled={discardDisabled}
-          >
+          <Button variant="ghost" size="sm" onClick={onDiscard} disabled={discardDisabled}>
             {t('config_management.actions.discard')}
-          </button>
-          <button
-            type="button"
-            className={styles.savePill}
-            onClick={onSave}
-            disabled={saveDisabled}
-          >
-            {saving ? <LoadingSpinner size={14} /> : <IconCheck size={15} />}
+          </Button>
+          <Button size="sm" onClick={onSave} disabled={saveDisabled} loading={saving}>
+            {saving ? null : <IconCheck size={14} />}
             {t('config_management.actions.save')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

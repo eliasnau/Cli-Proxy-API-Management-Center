@@ -26,7 +26,6 @@ import {
   IconSidebarOauth,
   IconSidebarPlugins,
   IconSidebarProviders,
-  IconSidebarQuickStart,
   IconSidebarQuota,
   IconSidebarRouting,
   IconSidebarStore,
@@ -49,7 +48,6 @@ import {
   resolvePluginAssetURL,
   type PluginResourceEntry,
 } from '@/features/plugins/pluginResources';
-import { APIKEY_FUN_DISPLAY_NAME, hasApiKeyFunConfig } from '@/features/providers/sponsor';
 import { triggerHeaderRefresh } from '@/hooks/useHeaderRefresh';
 import { LANGUAGE_LABEL_KEYS, LANGUAGE_ORDER } from '@/utils/constants';
 import { isSupportedLanguage } from '@/utils/language';
@@ -58,9 +56,9 @@ import type { Theme } from '@/types';
 
 const sidebarIcons: Record<string, ReactNode> = {
   dashboard: <IconSidebarDashboard size={18} />,
-  quickStart: <IconSidebarQuickStart size={18} />,
   aiProviders: <IconSidebarProviders size={18} />,
   authFiles: <IconSidebarAuthFiles size={18} />,
+  accounts: <IconSidebarAuthFiles size={18} />,
   oauth: <IconSidebarOauth size={18} />,
   quota: <IconSidebarQuota size={18} />,
   devices: <IconSidebarDevices size={18} />,
@@ -75,6 +73,8 @@ const sidebarIcons: Record<string, ReactNode> = {
 interface SidebarNavLinkItem {
   kind?: 'link';
   path: string;
+  /** Other routes that should highlight this item (old routes, sub pages). */
+  aliases?: string[];
   labelKey?: string;
   metaKey?: string;
   label?: string;
@@ -100,9 +100,38 @@ const NAV_TOOLTIP_VIEWPORT_MARGIN = 8;
 
 interface SidebarNavGroup {
   id: string;
-  labelKey: string;
+  labelKey?: string;
   items: SidebarNavItem[];
 }
+
+const NAV_MORE_OPEN_STORAGE_KEY = 'cpamc.sidebar.moreOpen';
+
+const normalizeNavPath = (pathname: string) => {
+  const trimmed = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+  return trimmed === '/dashboard' ? '/' : trimmed;
+};
+
+/**
+ * Explicit active matching. NavLink's built-in matching only knows one path, so the
+ * dashboard (served at both / and /dashboard) and merged pages with old routes never
+ * highlighted reliably.
+ */
+const isNavItemActive = (item: SidebarNavLinkItem, pathname: string) => {
+  const current = normalizeNavPath(pathname);
+  return [item.path, ...(item.aliases ?? [])].some((path) => {
+    const target = normalizeNavPath(path);
+    if (target === '/') return current === '/';
+    return current === target || current.startsWith(`${target}/`);
+  });
+};
+
+const readMoreOpen = () => {
+  try {
+    return localStorage.getItem(NAV_MORE_OPEN_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
 
 const flattenNavItems = (items: SidebarNavItem[]): SidebarNavLinkItem[] =>
   items.flatMap((item) => (item.kind === 'drawer' ? item.children : [item]));
@@ -323,7 +352,6 @@ export function MainLayout() {
 
   const fetchConfig = useConfigStore((state) => state.fetchConfig);
   const clearCache = useConfigStore((state) => state.clearCache);
-  const config = useConfigStore((state) => state.config);
 
   const theme = useThemeStore((state) => state.theme);
   const setTheme = useThemeStore((state) => state.setTheme);
@@ -332,6 +360,7 @@ export function MainLayout() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(readMoreOpen);
   const [authFilesCount, setAuthFilesCount] = useState<number | null>(null);
   const [railTooltip, setRailTooltip] = useState<{
     targetID: string;
@@ -589,123 +618,89 @@ export function MainLayout() {
       })
     : [];
 
-  const isApiKeyFunConfigured = hasApiKeyFunConfig(config);
-  const quickStartNavItem: SidebarNavLinkItem = {
-    path: '/quick-start',
-    label: isApiKeyFunConfigured ? APIKEY_FUN_DISPLAY_NAME : undefined,
-    labelKey: isApiKeyFunConfigured ? undefined : 'nav.quick_start',
-    metaKey: 'nav_meta.quick_start',
-    icon: sidebarIcons.quickStart,
-  };
+  const accountsBadgeLabel =
+    typeof authFilesCount === 'number'
+      ? t('sidebar.auth_files_count', { count: authFilesCount })
+      : undefined;
+
+  // Primary destinations: the pages used every day.
+  const primaryNavItems: SidebarNavItem[] = [
+    {
+      path: '/',
+      aliases: ['/dashboard'],
+      labelKey: 'nav.dashboard',
+      metaKey: 'nav_meta.dashboard',
+      icon: sidebarIcons.dashboard,
+    },
+    {
+      path: '/devices',
+      labelKey: 'nav.devices',
+      metaKey: 'nav_meta.devices',
+      icon: sidebarIcons.devices,
+    },
+    {
+      path: '/routing',
+      labelKey: 'nav.routing',
+      metaKey: 'nav_meta.routing',
+      icon: sidebarIcons.routing,
+    },
+    {
+      path: '/accounts',
+      aliases: ['/ai-providers', '/auth-files', '/oauth'],
+      labelKey: 'nav.accounts',
+      metaKey: 'nav_meta.accounts',
+      badge: authFilesCount ?? undefined,
+      badgeLabel: accountsBadgeLabel,
+      icon: sidebarIcons.accounts,
+    },
+    {
+      path: '/config',
+      labelKey: 'nav.config_management',
+      metaKey: 'nav_meta.config_management',
+      icon: sidebarIcons.config,
+    },
+    {
+      path: '/logs',
+      labelKey: 'nav.logs',
+      metaKey: 'nav_meta.logs',
+      icon: sidebarIcons.logs,
+    },
+  ];
+
+  // Rarely used pages live in a small "More" group at the bottom of the sidebar.
+  const secondaryNavItems: SidebarNavLinkItem[] = [
+    {
+      path: '/quota',
+      labelKey: 'nav.quota_management',
+      metaKey: 'nav_meta.quota_management',
+      icon: sidebarIcons.quota,
+    },
+    ...(supportsPlugin
+      ? [
+          {
+            path: '/plugins',
+            labelKey: 'nav.plugins',
+            metaKey: 'nav_meta.plugins',
+            icon: sidebarIcons.plugins,
+          },
+          {
+            path: '/plugin-store',
+            labelKey: 'nav.plugin_store',
+            metaKey: 'nav_meta.plugin_store',
+            icon: sidebarIcons.pluginStore,
+          },
+        ]
+      : []),
+    {
+      path: '/system',
+      labelKey: 'nav.system_info',
+      metaKey: 'nav_meta.system_info',
+      icon: sidebarIcons.system,
+    },
+  ];
 
   const navGroups: SidebarNavGroup[] = [
-    {
-      id: 'operate',
-      labelKey: 'nav_groups.operate',
-      items: [
-        {
-          path: '/',
-          labelKey: 'nav.dashboard',
-          metaKey: 'nav_meta.dashboard',
-          icon: sidebarIcons.dashboard,
-        },
-        ...(!isApiKeyFunConfigured ? [quickStartNavItem] : []),
-      ],
-    },
-    {
-      id: 'gateway',
-      labelKey: 'nav_groups.gateway',
-      items: [
-        {
-          path: '/ai-providers',
-          labelKey: 'nav.ai_providers',
-          metaKey: 'nav_meta.ai_providers',
-          icon: sidebarIcons.aiProviders,
-        },
-        {
-          path: '/auth-files',
-          labelKey: 'nav.auth_files',
-          metaKey: 'nav_meta.auth_files',
-          badge: authFilesCount ?? undefined,
-          badgeLabel:
-            typeof authFilesCount === 'number'
-              ? t('sidebar.auth_files_count', { count: authFilesCount })
-              : undefined,
-          icon: sidebarIcons.authFiles,
-        },
-        {
-          path: '/oauth',
-          labelKey: 'nav.oauth',
-          metaKey: 'nav_meta.oauth',
-          icon: sidebarIcons.oauth,
-        },
-        {
-          path: '/routing',
-          labelKey: 'nav.routing',
-          metaKey: 'nav_meta.routing',
-          icon: sidebarIcons.routing,
-        },
-        ...(isApiKeyFunConfigured ? [quickStartNavItem] : []),
-      ],
-    },
-    {
-      id: 'observe',
-      labelKey: 'nav_groups.observe',
-      items: [
-        {
-          path: '/devices',
-          labelKey: 'nav.devices',
-          metaKey: 'nav_meta.devices',
-          icon: sidebarIcons.devices,
-        },
-        {
-          path: '/quota',
-          labelKey: 'nav.quota_management',
-          metaKey: 'nav_meta.quota_management',
-          icon: sidebarIcons.quota,
-        },
-        {
-          path: '/logs',
-          labelKey: 'nav.logs',
-          metaKey: 'nav_meta.logs',
-          icon: sidebarIcons.logs,
-        },
-      ],
-    },
-    {
-      id: 'control',
-      labelKey: 'nav_groups.control',
-      items: [
-        {
-          path: '/config',
-          labelKey: 'nav.config_management',
-          metaKey: 'nav_meta.config_management',
-          icon: sidebarIcons.config,
-        },
-        ...(supportsPlugin
-          ? [
-              {
-                path: '/plugins',
-                labelKey: 'nav.plugins',
-                metaKey: 'nav_meta.plugins',
-                icon: sidebarIcons.plugins,
-              },
-              {
-                path: '/plugin-store',
-                labelKey: 'nav.plugin_store',
-                metaKey: 'nav_meta.plugin_store',
-                icon: sidebarIcons.pluginStore,
-              },
-            ]
-          : []),
-        {
-          path: '/system',
-          labelKey: 'nav.system_info',
-          metaKey: 'nav_meta.system_info',
-          icon: sidebarIcons.system,
-        },
-      ],
-    },
+    { id: 'primary', items: primaryNavItems },
     ...(pluginPageNavItems.length > 0
       ? [
           {
@@ -716,42 +711,38 @@ export function MainLayout() {
         ]
       : []),
   ];
-  const navItems = navGroups.flatMap((group) => flattenNavItems(group.items));
-  const navOrder = navItems.map((item) => item.path);
-  const getRouteOrder = (pathname: string) => {
-    const trimmedPath =
-      pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
-    const normalizedPath = trimmedPath === '/dashboard' ? '/' : trimmedPath;
+  const navItems = [
+    ...navGroups.flatMap((group) => flattenNavItems(group.items)),
+    ...secondaryNavItems,
+  ];
+  const isSecondaryRouteActive = secondaryNavItems.some((item) =>
+    isNavItemActive(item, location.pathname)
+  );
+  const showSecondaryItems = moreOpen || isSecondaryRouteActive || !showSidebarLabels;
 
-    const authFilesIndex = navOrder.indexOf('/auth-files');
-    if (authFilesIndex !== -1) {
-      if (normalizedPath === '/auth-files') return authFilesIndex;
-      if (normalizedPath.startsWith('/auth-files/')) {
-        if (normalizedPath.startsWith('/auth-files/oauth-excluded')) return authFilesIndex + 0.1;
-        if (normalizedPath.startsWith('/auth-files/oauth-model-alias')) return authFilesIndex + 0.2;
-        return authFilesIndex + 0.05;
-      }
+  const getRouteOrder = (pathname: string) => {
+    const normalizedPath = normalizeNavPath(pathname);
+
+    const accountsIndex = navItems.findIndex((item) => item.path === '/accounts');
+    if (accountsIndex !== -1 && normalizedPath.startsWith('/auth-files/')) {
+      if (normalizedPath.startsWith('/auth-files/oauth-excluded')) return accountsIndex + 0.1;
+      if (normalizedPath.startsWith('/auth-files/oauth-model-alias')) return accountsIndex + 0.2;
+      return accountsIndex + 0.05;
     }
 
-    const exactIndex = navOrder.indexOf(normalizedPath);
-    if (exactIndex !== -1) return exactIndex;
-    const nestedIndex = navOrder.findIndex(
-      (path) => path !== '/' && normalizedPath.startsWith(`${path}/`)
+    const exactIndex = navItems.findIndex((item) =>
+      [item.path, ...(item.aliases ?? [])].includes(normalizedPath)
     );
+    if (exactIndex !== -1) return exactIndex;
+    const nestedIndex = navItems.findIndex((item) => isNavItemActive(item, normalizedPath));
     return nestedIndex === -1 ? null : nestedIndex;
   };
 
   const getTransitionVariant = useCallback((fromPathname: string, toPathname: string) => {
-    const normalize = (pathname: string) => {
-      const trimmed =
-        pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
-      return trimmed === '/dashboard' ? '/' : trimmed;
-    };
-
-    const from = normalize(fromPathname);
-    const to = normalize(toPathname);
+    const from = normalizeNavPath(fromPathname);
+    const to = normalizeNavPath(toPathname);
     const isAuthFiles = (pathname: string) =>
-      pathname === '/auth-files' || pathname.startsWith('/auth-files/');
+      pathname === '/accounts' || pathname === '/auth-files' || pathname.startsWith('/auth-files/');
     if (isAuthFiles(from) && isAuthFiles(to)) return 'ios';
     return 'vertical';
   }, []);
@@ -777,6 +768,18 @@ export function MainLayout() {
     }
     showNotification(t('notification.data_refreshed'), 'success');
   };
+
+  const toggleMore = useCallback(() => {
+    setMoreOpen((current) => {
+      const next = !current;
+      try {
+        localStorage.setItem(NAV_MORE_OPEN_STORAGE_KEY, next ? '1' : '0');
+      } catch {
+        // Storage unavailable: keep the in-memory state only.
+      }
+      return next;
+    });
+  }, []);
 
   const togglePluginResourceDrawer = useCallback((drawerID: string) => {
     setExpandedPluginResourceIDs((current) => {
@@ -877,7 +880,10 @@ export function MainLayout() {
       <NavLink
         key={item.path}
         to={item.path}
-        className={({ isActive }) => `${className} ${isActive ? 'active' : ''}`}
+        end={item.path === '/'}
+        className={() =>
+          `${className} ${isNavItemActive(item, location.pathname) ? 'active' : ''}`
+        }
         onClick={() => {
           focusedRailItemRef.current = null;
           setSidebarOpen(false);
@@ -926,7 +932,7 @@ export function MainLayout() {
       return renderNavLink(item);
     }
 
-    const isActive = item.children.some((child) => child.path === location.pathname);
+    const isActive = item.children.some((child) => isNavItemActive(child, location.pathname));
     const isOpen = isActive || expandedPluginResourceIDs.has(item.id);
 
     return (
@@ -1018,10 +1024,10 @@ export function MainLayout() {
             </div>
           </div>
 
-          <div className="nav-section">
+          <nav className="nav-section" aria-label={t('nav_groups.primary')}>
             {navGroups.map((group, idx) => (
               <div className="nav-group" key={group.id}>
-                {showSidebarLabels ? (
+                {group.labelKey && showSidebarLabels ? (
                   <div className="nav-group-label">{t(group.labelKey)}</div>
                 ) : (
                   idx > 0 && <div className="nav-group-divider" aria-hidden="true" />
@@ -1029,6 +1035,32 @@ export function MainLayout() {
                 {group.items.map((item) => renderNavItem(item))}
               </div>
             ))}
+          </nav>
+
+          <div className="nav-section nav-section-secondary">
+            <div className="nav-group">
+              {showSidebarLabels ? (
+                <button
+                  type="button"
+                  className={`nav-more-toggle ${showSecondaryItems ? 'open' : ''}`}
+                  onClick={toggleMore}
+                  aria-expanded={showSecondaryItems}
+                  aria-controls="sidebar-more-items"
+                >
+                  <span>{t('nav_groups.more')}</span>
+                  <span className="nav-drawer-caret" aria-hidden="true">
+                    <IconChevronDown size={14} />
+                  </span>
+                </button>
+              ) : (
+                <div className="nav-group-divider" aria-hidden="true" />
+              )}
+              {showSecondaryItems ? (
+                <div className="nav-group" id="sidebar-more-items">
+                  {secondaryNavItems.map((item) => renderNavLink(item))}
+                </div>
+              ) : null}
+            </div>
           </div>
         </aside>
 

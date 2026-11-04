@@ -1,13 +1,41 @@
 @use '../../styles/mixins' as *;
-@use '../../styles/variables' as *;
 
 .page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
-  padding: 24px;
-  box-sizing: border-box;
+  min-width: 0;
+}
+
+.pageEmbedded {
+  gap: 12px;
+}
+
+/* Embedded in Accounts: header actions only, right-aligned. */
+.embeddedToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Button wraps children in one span; lay icon + label out inline. */
+.iconTextButton > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spin {
+  animation: providers-spin 0.9s linear infinite;
+}
+
+@keyframes providers-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .layout {
@@ -16,13 +44,13 @@
   gap: 16px;
   grid-template-columns: minmax(0, 1fr);
 
-  @media (min-width: 1280px) {
-    grid-template-columns: 240px minmax(0, 1fr);
+  @media (min-width: 1024px) {
+    grid-template-columns: 200px minmax(0, 1fr);
   }
 }
 
 .layoutSingle {
-  @media (min-width: 1280px) {
+  @media (min-width: 1024px) {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -34,13 +62,8 @@
   min-width: 0;
 }
 
-.modelCatalogSlot {
-  margin-top: 4px;
-}
-
-@media (max-width: 768px) {
-  .page {
-    padding: 16px;
-    gap: 16px;
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
   }
 }

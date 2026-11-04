@@ -5,7 +5,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
   min-width: 0;
   /* 悬浮保存栏出现时由 --config-action-bar-height 撑出底部留白 */
@@ -14,20 +14,23 @@
   );
 }
 
-/* 工具栏行：模式相关搜索（字段搜索 / 源码搜索）+ 右端的模式切换 */
+/* 可视化模式工具栏：左侧下划线 tabs，右侧紧凑字段搜索，整行一条发丝底线 */
 .toolbar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 10px;
-  flex-wrap: wrap;
-  min-width: 0;
-}
-
-.tabsRow {
-  display: flex;
+  align-items: flex-end;
+  gap: 8px 16px;
   min-width: 0;
   border-bottom: 1px solid var(--border-color);
+
+  > :last-child {
+    margin-bottom: 4px;
+  }
+}
+
+.sourceToolbar {
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 
 .panel {
@@ -37,7 +40,12 @@
 }
 
 @include mobile {
-  .page {
-    gap: 16px;
+  .toolbar {
+    flex-direction: column-reverse;
+    align-items: stretch;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
   }
 }

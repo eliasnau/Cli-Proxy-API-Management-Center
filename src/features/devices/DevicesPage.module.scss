@@ -1382,3 +1382,125 @@
     outline: none;
   }
 }
+
+// ─── Access (per-device provider / account restriction) ───
+
+.badge_access {
+  background: var(--primary-10);
+  color: var(--primary-color);
+}
+
+.access {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 4px 0 0;
+  padding: 14px 0 0;
+  border: 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.accessTitle {
+  padding: 0;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.accessHint {
+  margin: -4px 0 4px;
+  color: var(--text-tertiary);
+  font-size: 12.5px;
+}
+
+.accessLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.accessMuted {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 4px 11px;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-full;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition:
+    background var(--dur-hover) var(--ease-out-strong),
+    border-color var(--dur-hover) var(--ease-out-strong),
+    color var(--dur-hover) var(--ease-out-strong);
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
+  }
+}
+
+.chipActive {
+  border-color: var(--primary-30);
+  background: var(--primary-10);
+  color: var(--primary-color);
+}
+
+.accountList {
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-md;
+}
+
+.accountOption {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.accountText {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.accountProvider {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.accountName {
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

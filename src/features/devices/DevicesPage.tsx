@@ -20,6 +20,7 @@ import { useHeaderRefresh } from '@/hooks/useHeaderRefresh';
 import {
   devicesApi,
   type Device,
+  type DeviceAccount,
   type DeviceMonthUsage,
   type DeviceUsageReport,
 } from '@/services/api';
@@ -35,6 +36,8 @@ import {
   formatUsd,
   maskKey,
 } from './deviceFormat';
+import { AccessEditor, type AccessDraft } from './AccessEditor';
+import { accessDetail, accessSummary, parseModelPatterns } from './deviceAccess';
 import { PricingModal } from './PricingModal';
 import { seriesColor } from './chartUtils';
 import { SpendChart, Sparkline } from './SpendChart';
@@ -57,7 +60,7 @@ import {
 } from './usageModel';
 import styles from './DevicesPage.module.scss';
 
-interface DeviceDraft {
+interface DeviceDraft extends AccessDraft {
   id: string | null;
   name: string;
   limit: string;
@@ -66,7 +69,15 @@ interface DeviceDraft {
 
 type DeviceRowStatus = 'active' | 'disabled' | 'limited' | 'at_risk';
 
-const emptyDraft: DeviceDraft = { id: null, name: '', limit: '', note: '' };
+const emptyDraft: DeviceDraft = {
+  id: null,
+  name: '',
+  limit: '',
+  note: '',
+  allowedProviders: [],
+  allowedAuths: [],
+  models: '',
+};
 
 interface Entry {
   device: Device;
@@ -93,7 +104,29 @@ export function DevicesPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [chartView, setChartView] = useState<'chart' | 'table'>('chart');
+  const [accounts, setAccounts] = useState<DeviceAccount[] | null>(null);
+  const [accountProviders, setAccountProviders] = useState<string[]>([]);
+  const [accountsFailed, setAccountsFailed] = useState(false);
   const requestSeq = useRef(0);
+  const accountsSeq = useRef(0);
+
+  // Accounts feed the access editor and the access tooltips; failures only affect those.
+  const loadAccounts = useCallback(async () => {
+    const seq = ++accountsSeq.current;
+    setAccountsFailed(false);
+    try {
+      const result = await devicesApi.accounts();
+      if (seq !== accountsSeq.current) return;
+      setAccounts(result.accounts);
+      setAccountProviders(result.providers);
+    } catch {
+      if (seq === accountsSeq.current) setAccountsFailed(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (connected) void loadAccounts();
+  }, [connected, loadAccounts]);
 
   const load = useCallback(async () => {
     const seq = ++requestSeq.current;
@@ -211,8 +244,18 @@ export function DevicesPage() {
     showNotification(ok ? t('devices.copied') : t('devices.copy_failed'), ok ? 'success' : 'error');
   };
 
+  const openDraft = (next: DeviceDraft) => {
+    setDraft(next);
+    if (accounts === null || accountsFailed) void loadAccounts();
+  };
+
   const saveDraft = async () => {
     if (!draft) return;
+    const access = {
+      allowedProviders: draft.allowedProviders,
+      allowedAuths: draft.allowedAuths,
+      allowedModels: parseModelPatterns(draft.models),
+    };
     const name = draft.name.trim();
     const limit = draft.limit.trim() === '' ? 0 : Number(draft.limit);
     if (!name || !Number.isFinite(limit) || limit < 0) {
@@ -223,10 +266,20 @@ export function DevicesPage() {
     try {
       if (draft.id) {
         replaceDevice(
-          await devicesApi.update(draft.id, { name, monthlyLimitUsd: limit, note: draft.note })
+          await devicesApi.update(draft.id, {
+            name,
+            monthlyLimitUsd: limit,
+            note: draft.note,
+            ...access,
+          })
         );
       } else {
-        const created = await devicesApi.create({ name, monthlyLimitUsd: limit, note: draft.note });
+        const created = await devicesApi.create({
+          name,
+          monthlyLimitUsd: limit,
+          note: draft.note,
+          ...access,
+        });
         setNewKeyDevice(created);
         await load();
       }
@@ -314,7 +367,7 @@ export function DevicesPage() {
           <Button variant="secondary" size="sm" onClick={() => setPricingOpen(true)}>
             {t('devices.pricing')}
           </Button>
-          <Button size="sm" onClick={() => setDraft(emptyDraft)} disabled={!connected}>
+          <Button size="sm" onClick={() => openDraft(emptyDraft)} disabled={!connected}>
             <IconPlus size={16} />
             {t('devices.add')}
           </Button>
@@ -506,7 +559,7 @@ export function DevicesPage() {
             </div>
             <strong>{t('devices.empty_title')}</strong>
             <p>{t('devices.empty_desc')}</p>
-            <Button size="sm" onClick={() => setDraft(emptyDraft)}>
+            <Button size="sm" onClick={() => openDraft(emptyDraft)}>
               <IconPlus size={16} />
               {t('devices.add')}
             </Button>
@@ -518,6 +571,7 @@ export function DevicesPage() {
                 key={entry.device.id}
                 entry={entry}
                 window={window}
+                accounts={accounts ?? []}
                 revealed={Boolean(revealed[entry.device.id])}
                 expanded={expanded === entry.device.id}
                 onToggleExpand={() =>
@@ -529,11 +583,14 @@ export function DevicesPage() {
                 onCopy={() => void copy(entry.device.key)}
                 onToggleEnabled={(value) => void toggleDisabled(entry.device, value)}
                 onEdit={() =>
-                  setDraft({
+                  openDraft({
                     id: entry.device.id,
                     name: entry.device.name,
                     limit: entry.device.monthlyLimitUsd ? String(entry.device.monthlyLimitUsd) : '',
                     note: entry.device.note,
+                    allowedProviders: entry.device.allowedProviders,
+                    allowedAuths: entry.device.allowedAuths,
+                    models: entry.device.allowedModels.join(', '),
                   })
                 }
                 onRotate={() => rotate(entry.device)}
@@ -591,6 +648,13 @@ export function DevicesPage() {
               label={t('devices.field_note')}
               value={draft.note}
               onChange={(e) => setDraft({ ...draft, note: e.target.value })}
+            />
+            <AccessEditor
+              value={draft}
+              onChange={(access) => setDraft({ ...draft, ...access })}
+              accounts={accounts}
+              providers={accountProviders}
+              loadFailed={accountsFailed}
             />
             <button type="submit" hidden />
           </form>
@@ -744,6 +808,7 @@ function DailyMatrix({
 interface DeviceRowProps {
   entry: Entry;
   window: MonthWindow;
+  accounts: DeviceAccount[];
   revealed: boolean;
   expanded: boolean;
   onToggleExpand: () => void;
@@ -759,6 +824,7 @@ interface DeviceRowProps {
 function DeviceRow({
   entry,
   window,
+  accounts,
   revealed,
   expanded,
   onToggleExpand,
@@ -786,6 +852,7 @@ function DeviceRow({
   const projectedRatio = limit > 0 ? Math.min(1, projected / limit) : 0;
   const values = useMemo(() => dailySeries(usage, window), [usage, window]);
   const panelId = `device-drill-${device.id}`;
+  const access = accessSummary(device, t);
 
   return (
     <article className={`${styles.row} ${expanded ? styles.rowOpen : ''}`}>
@@ -799,6 +866,14 @@ function DeviceRow({
                 <span className={styles.badgeDot} aria-hidden="true" />
                 {t(`devices.status_${status}`)}
               </span>
+              {access ? (
+                <span
+                  className={`${styles.badge} ${styles.badge_access}`}
+                  title={accessDetail(device, accounts, t)}
+                >
+                  {access}
+                </span>
+              ) : null}
             </div>
             <div className={styles.keyRow}>
               <code className={styles.key}>{revealed ? device.key : maskKey(device.key)}</code>

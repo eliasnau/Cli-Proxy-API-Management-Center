@@ -4,13 +4,12 @@
 .panel {
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  padding: 20px;
+  border-radius: 8px;
+  padding: 16px;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 16px;
 }
 
 .header {
@@ -82,9 +81,9 @@
 .title {
   margin: 0;
   color: var(--text-primary);
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.22;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
   letter-spacing: 0;
 }
 
@@ -97,12 +96,10 @@
 }
 
 .empty {
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 32px;
+  padding: 20px 12px;
   text-align: center;
-  color: var(--muted-foreground);
-  font-size: 14px;
+  color: var(--text-secondary);
+  font-size: 13px;
 }
 
 .emptyActions {
@@ -118,13 +115,14 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 13px;
+  height: 30px;
+  padding: 0 12px;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 6px;
   background: var(--bg-primary);
   color: var(--text-primary);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
   text-decoration: none;
@@ -167,27 +165,13 @@
 }
 
 .emptyActionButtonEmphasis {
-  color: var(--amber-text);
-  border-color: color-mix(in srgb, var(--amber-color) 48%, var(--border-color));
-  background: color-mix(in srgb, var(--amber-color) 14%, var(--bg-primary));
-  font-weight: 600;
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--amber-color) 18%, transparent);
-
-  &:hover {
-    border-color: color-mix(in srgb, var(--amber-color) 72%, var(--border-color));
-    background: color-mix(in srgb, var(--amber-color) 20%, var(--bg-primary));
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--amber-color) 18%, transparent);
-  }
-
-  &:focus-visible {
-    outline-color: var(--amber-color);
-  }
+  color: var(--primary-color);
 }
 
 .primaryAction {
-  height: 38px;
-  font-size: 14px;
-  font-weight: 600;
+  height: 32px;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -205,16 +189,6 @@
 }
 
 @media (max-width: 768px) {
-  .panel {
-    padding: 16px;
-    gap: 18px;
-  }
-
-  .title {
-    font-size: 22px;
-    line-height: 1.25;
-  }
-
   .titleRow {
     gap: 10px;
   }

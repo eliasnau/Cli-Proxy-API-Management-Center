@@ -1,10 +1,9 @@
 import { Navigate, useRoutes, type Location } from 'react-router-dom';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { ProvidersWorkbenchPage } from '@/features/providers/ProvidersWorkbenchPage';
-import { AuthFilesPage } from '@/features/authFiles/AuthFilesPage';
+import { AccountsPage } from '@/features/accounts/AccountsPage';
 import { AuthFilesOAuthExcludedEditPage } from '@/pages/AuthFilesOAuthExcludedEditPage';
 import { AuthFilesOAuthModelAliasEditPage } from '@/pages/AuthFilesOAuthModelAliasEditPage';
-import { OAuthPage } from '@/features/oauth/OAuthPage';
 import { QuotaPage } from '@/features/quota/QuotaPage';
 import { RoutingPage } from '@/features/routing/RoutingPage';
 import { PluginResourcePage } from '@/features/plugins/PluginResourcePage';
@@ -23,12 +22,16 @@ const createMainRoutes = (supportsPlugin: boolean) => [
   { path: '/api-keys', element: <Navigate to="/config" replace /> },
   { path: '/quick-start', element: <ProvidersWorkbenchPage fixedBrand="apikeyFun" /> },
   { path: '/quick-start/*', element: <Navigate to="/quick-start" replace /> },
-  { path: '/ai-providers', element: <ProvidersWorkbenchPage /> },
-  { path: '/ai-providers/*', element: <Navigate to="/ai-providers" replace /> },
-  { path: '/auth-files', element: <AuthFilesPage /> },
+  // AI providers, auth files and OAuth login are merged into one Accounts page.
+  // /auth-files stays a real route (its sub pages navigate back to it).
+  { path: '/accounts', element: <AccountsPage /> },
+  { path: '/accounts/*', element: <Navigate to="/accounts" replace /> },
+  { path: '/ai-providers', element: <Navigate to="/accounts?tab=providers" replace /> },
+  { path: '/ai-providers/*', element: <Navigate to="/accounts?tab=providers" replace /> },
+  { path: '/auth-files', element: <AccountsPage initialTab="auth-files" /> },
   { path: '/auth-files/oauth-excluded', element: <AuthFilesOAuthExcludedEditPage /> },
   { path: '/auth-files/oauth-model-alias', element: <AuthFilesOAuthModelAliasEditPage /> },
-  { path: '/oauth', element: <OAuthPage /> },
+  { path: '/oauth', element: <Navigate to="/accounts?tab=add" replace /> },
   { path: '/routing', element: <RoutingPage /> },
   { path: '/quota', element: <QuotaPage /> },
   { path: '/devices', element: <DevicesPage /> },

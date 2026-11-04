@@ -1,63 +1,49 @@
-@use '../../../styles/mixins' as *;
-
-/* 可视化/源码 segmented：与认证文件工具栏分段控件同语汇 */
+/* 可视化/源码 segmented：与 @/components/page Tabs 的 segmented 变体同几何（26px 段、6px 圆角）。 */
 
 .segmented {
   display: inline-flex;
   align-items: center;
   gap: 2px;
   padding: 2px;
-  border-radius: $radius-full;
   border: 1px solid var(--border-color);
+  border-radius: $radius-md;
   background: var(--bg-tertiary);
   flex-shrink: 0;
 }
 
 .segment {
+  height: 26px;
+  padding: 0 10px;
   border: 0;
-  background: none;
-  cursor: pointer;
-  padding: 5px 12px;
-  border-radius: $radius-full;
-  font-size: 12px;
-  font-weight: 550;
-  line-height: 1.3;
+  border-radius: 6px;
+  background: transparent;
   color: var(--text-secondary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
   white-space: nowrap;
-  transition:
-    color var(--dur-hover, 200ms) var(--ease-out-strong, ease-out),
-    background-color var(--dur-hover, 200ms) var(--ease-out-strong, ease-out),
-    box-shadow var(--dur-hover, 200ms) var(--ease-out-strong, ease-out),
-    transform var(--dur-press, 160ms) var(--ease-out-strong, ease-out);
+  cursor: pointer;
+  transition: color var(--dur-hover, 200ms) var(--ease-out-strong, ease-out);
+
+  &:hover:not(:disabled):not(.segmentActive) {
+    color: var(--text-primary);
+  }
 
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.55;
-  }
-
-  &:active:not(:disabled) {
-    transform: scale(0.96);
+    opacity: 0.5;
   }
 
   &:focus-visible {
     outline: 2px solid var(--primary-color);
-    outline-offset: -1px;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .segment:hover:not(:disabled):not(.segmentActive) {
-    color: var(--text-primary);
+    outline-offset: 1px;
   }
 }
 
 .segmentActive {
   color: var(--text-primary);
-  font-weight: 650;
-  background: var(--floating-surface, var(--bg-primary));
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.12),
-    0 1px 2px rgba(0, 0, 0, 0.08);
+  background: var(--bg-primary);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
 
   /* 整体禁用（保存/加载中）时激活段仍保持完整对比度 —— 当前模式本身是有效信息 */
   &:disabled {
@@ -68,9 +54,5 @@
 @media (prefers-reduced-motion: reduce) {
   .segment {
     transition: none;
-  }
-
-  .segment:active:not(:disabled) {
-    transform: none;
   }
 }

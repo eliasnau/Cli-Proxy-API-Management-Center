@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { IconEyeOff, IconNetwork } from '@/components/ui/icons';
 import { OAuthEditorProviderCard } from '@/features/authFiles/components/OAuthEditorProviderCard';
 import {
   ExcludedModelsPicker,
   normalizeExcludedRules,
   type ExcludedModelsCatalogState,
 } from '@/components/excludedModels';
+import { PageHeader } from '@/components/page';
 import { SecondaryScreenShell } from '@/components/common/SecondaryScreenShell';
 import { useEdgeSwipeBack } from '@/hooks/useEdgeSwipeBack';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
@@ -369,15 +369,10 @@ export function AuthFilesOAuthExcludedEditPage() {
         </Card>
       ) : (
         <>
-          <div className={styles.intro}>
-            <span className={styles.introIcon}>
-              <IconEyeOff size={22} aria-hidden="true" />
-            </span>
-            <div>
-              <h1 className={styles.introTitle}>{t('oauth_excluded.title')}</h1>
-              <p className={styles.description}>{t('oauth_excluded.editor_description')}</p>
-            </div>
-          </div>
+          <PageHeader
+            title={t('oauth_excluded.title')}
+            subtitle={t('oauth_excluded.editor_description')}
+          />
 
           <OAuthEditorProviderCard
             provider={provider}
@@ -390,9 +385,6 @@ export function AuthFilesOAuthExcludedEditPage() {
           <Card className={styles.settingsCard}>
             <div className={styles.editorHeader}>
               <div className={styles.sectionHeading}>
-                <span className={styles.stepNumber} aria-hidden="true">
-                  02
-                </span>
                 <div className={styles.headingCopy}>
                   <h2 className={styles.sectionTitle} id="oauth-excluded-models-label">
                     {t('oauth_excluded.models_label')}
@@ -417,10 +409,7 @@ export function AuthFilesOAuthExcludedEditPage() {
                   labelledBy="oauth-excluded-models-label"
                 />
               ) : (
-                <div className={styles.emptyModels}>
-                  <IconNetwork size={24} aria-hidden="true" />
-                  {t('oauth_excluded.provider_required')}
-                </div>
+                <div className={styles.emptyModels}>{t('oauth_excluded.provider_required')}</div>
               )}
             </div>
           </Card>

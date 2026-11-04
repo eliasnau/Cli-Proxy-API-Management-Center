@@ -407,6 +407,28 @@ export const routingApi = {
   /** The stored v8 configuration document, unnormalized. */
   getRawConfig: () => apiClient.get<unknown>('/config'),
 
+  /** Core routing settings (strategy, session affinity, retry) from the stored configuration. */
+  async getSettings(): Promise<RoutingSettings> {
+    return readRoutingSettings(await routingApi.getRawConfig());
+  },
+
+  /** Writes only the changed core routing settings; the backend merges the `routing` object. */
+  async saveSettings(changes: Partial<RoutingSettings>): Promise<void> {
+    const routing: Record<string, unknown> = {};
+    const retry: Record<string, unknown> = {};
+    if (changes.strategy !== undefined) routing.strategy = changes.strategy;
+    if (changes.sessionAffinity !== undefined) {
+      routing['session-affinity'] = changes.sessionAffinity;
+    }
+    if (changes.requestRetry !== undefined) retry['request-retry'] = changes.requestRetry;
+    if (changes.maxRetryCredentials !== undefined) {
+      retry['max-retry-credentials'] = changes.maxRetryCredentials;
+    }
+    if (Object.keys(retry).length) routing.retry = retry;
+    if (!Object.keys(routing).length) return;
+    await apiClient.patch('/config', { routing });
+  },
+
   /** The credentials the board shows next to the stored configuration. */
   async listCredentials(): Promise<AuthFileItem[]> {
     const response = await authFilesApi.list();

@@ -125,11 +125,10 @@ export function TierLadder({
       .join(' ');
     return (
       <li className={className} {...dropHandlers(target)} aria-hidden={!between || undefined}>
-        <span className={styles.rail} aria-hidden="true" />
         {dragKey && valid ? (
           <span className={styles.gapDrop}>{t('routing.drop_new_tier')}</span>
         ) : between ? (
-          // The rail already draws the fall-through; the sentence is for assistive tech only.
+          // The fall-through is implied by the ladder; the sentence is for assistive tech only.
           <span className={styles.srOnly}>{t('routing.connector')}</span>
         ) : null}
       </li>
@@ -139,7 +138,6 @@ export function TierLadder({
   return (
     <ol ref={ladderRef} className={styles.ladder}>
       <li className={styles.entry}>
-        <span className={styles.entryDot} aria-hidden="true" />
         <span className={styles.entryLabel}>{t('routing.entry')}</span>
         <div className={styles.entryControl}>{entryControl}</div>
       </li>
@@ -165,9 +163,6 @@ export function TierLadder({
             {renderGap(index)}
             <li className={className} {...dropHandlers(target)} aria-label={label}>
               <div className={styles.tierHead}>
-                <span className={styles.tierIndex} aria-hidden="true">
-                  {index + 1}
-                </span>
                 <span className={styles.tierName}>{label}</span>
                 <span className={changed ? styles.tierPriorityChanged : styles.tierPriority}>
                   {changed && original !== null
@@ -202,8 +197,7 @@ export function TierLadder({
       })}
       {renderGap(tiers.length)}
       <li className={styles.exhausted}>
-        <span className={styles.exhaustedDot} aria-hidden="true" />
-        <span className={styles.entryLabel}>{t('routing.exhausted')}</span>
+        <span className={styles.exhaustedLabel}>{t('routing.exhausted')}</span>
         <span className={styles.exhaustedText}>
           {draft.settings.requestRetry > 0
             ? t('routing.exhausted_retry', { count: draft.settings.requestRetry })

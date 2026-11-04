@@ -2,8 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 're
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { animate } from 'motion/mini';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { IconCheck } from '@/components/ui/icons';
+import { Button } from '@/components/ui/Button';
 import { prefersReducedMotion } from '@/hooks/motion';
 import { useActionBarHeightVar } from '@/hooks/useActionBarHeightVar';
 import styles from './RoutingSaveBar.module.scss';
@@ -31,8 +30,8 @@ export interface RoutingSaveBarProps {
 }
 
 /**
- * Floating save bar, styled after the config page's: a glass toolbar portalled to the body
- * that rises in on the first change and drops out once the draft is clean.
+ * Floating save bar: a small flat toolbar portalled to the body that rises in on the first
+ * change and drops out once the draft is clean.
  *
  * Unlike the config bar it is not centred on the page: it takes the exact left edge and width
  * of the policy column, so it never covers the ladder being arranged. When the policy panel
@@ -150,23 +149,24 @@ export function RoutingSaveBar({
           {t('routing.dirty_count', { count: shownCount })}
         </span>
         <div className={styles.actions}>
-          <button
+          <Button
             type="button"
-            className={styles.ghostAction}
+            variant="ghost"
+            size="sm"
             onClick={onDiscard}
             disabled={!visible || saving}
           >
             {t('routing.discard')}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className={styles.savePill}
+            size="sm"
             onClick={onSave}
-            disabled={!visible || saving || saveDisabled}
+            loading={saving}
+            disabled={!visible || saveDisabled}
           >
-            {saving ? <LoadingSpinner size={14} /> : <IconCheck size={15} />}
             {t('routing.save')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { usePageTransitionLayer } from '@/components/common/PageTransitionLayer';
 import { useHeaderRefresh } from '@/hooks/useHeaderRefresh';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Button } from '@/components/ui/Button';
+import { IconLoader2, IconPlus, IconRefreshCw } from '@/components/ui/icons';
+import { Notice, PageHeader } from '@/components/page';
 import { useAuthStore, useNotificationStore } from '@/stores';
 import { useProviderRecentRequests } from '@/components/providers/hooks/useProviderRecentRequests';
 import {
@@ -12,7 +15,6 @@ import {
   type ProviderRecentUsageMap,
 } from '@/components/providers/utils';
 import type { OpenAIProviderConfig } from '@/types';
-import { ProviderHeaderCard } from './components/ProviderHeaderCard';
 import { ProviderCategoryList } from './components/ProviderCategoryList';
 import { ProviderResourcePanel } from './components/ProviderResourcePanel';
 import type { ProviderPanelControls } from './components/ProviderResourcePanel';
@@ -42,22 +44,14 @@ interface SheetState {
   resource: ProviderResource | null;
 }
 
-interface ProvidersWorkbenchPageProps {
+export interface ProvidersWorkbenchPageProps {
   fixedBrand?: ProviderBrand;
+  /**
+   * Rendered inside another page (Accounts): no own PageHeader title and no outer padding;
+   * header actions move into a small right-aligned toolbar row.
+   */
+  embedded?: boolean;
 }
-
-const formatDateTime = (iso: string, locale?: string) => {
-  try {
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) return iso;
-    return new Intl.DateTimeFormat(locale, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(date);
-  } catch {
-    return iso;
-  }
-};
 
 const matchesFilter = (r: ProviderResource, normalized: string): boolean => {
   if (!normalized) return true;
@@ -98,8 +92,11 @@ const getResourceRecentSuccess = (
   ).success;
 };
 
-export function ProvidersWorkbenchPage({ fixedBrand }: ProvidersWorkbenchPageProps = {}) {
-  const { t, i18n } = useTranslation();
+export function ProvidersWorkbenchPage({
+  fixedBrand,
+  embedded = false,
+}: ProvidersWorkbenchPageProps = {}) {
+  const { t } = useTranslation();
   const connectionStatus = useAuthStore((s) => s.connectionStatus);
   const { showNotification, showConfirmation } = useNotificationStore();
 
@@ -257,36 +254,19 @@ export function ProvidersWorkbenchPage({ fixedBrand }: ProvidersWorkbenchPagePro
     updateActiveFilterState,
   ]);
 
-  const totalResources = useMemo(
-    () => groups.reduce((sum, g) => sum + g.resources.length, 0),
-    [groups]
-  );
-
-  const totalActive = useMemo(
-    () => groups.reduce((sum, g) => sum + g.resources.filter((r) => !r.disabled).length, 0),
-    [groups]
-  );
-
-  const providerFamilies = useMemo(
-    () => groups.filter((g) => g.resources.length > 0).length,
-    [groups]
-  );
   const quickStartResource = useMemo(
     () => (fixedBrand === 'apikeyFun' && activeGroup ? (activeGroup.resources[0] ?? null) : null),
     [activeGroup, fixedBrand]
   );
 
-  const updatedAtLabel = workbench.snapshot
-    ? formatDateTime(workbench.snapshot.fetchedAt, i18n.language)
-    : t('providersPage.modelCatalog.notLoaded');
   const headerTitle =
     fixedBrand === 'apikeyFun'
       ? quickStartResource
         ? APIKEY_FUN_DISPLAY_NAME
         : t('nav.quick_start')
-      : undefined;
+      : t('providersPage.header.title');
   const errorBanner = workbench.errorMessage ? (
-    <div className="error-box">{workbench.errorMessage}</div>
+    <Notice tone="error">{workbench.errorMessage}</Notice>
   ) : null;
 
   const openCreate = useCallback(() => {
@@ -372,11 +352,51 @@ export function ProvidersWorkbenchPage({ fixedBrand }: ProvidersWorkbenchPagePro
     closeSheet();
   }, [closeSheet, showNotification, t]);
 
+  const pageClassName = embedded ? `${styles.page} ${styles.pageEmbedded}` : styles.page;
+
+  const renderHeader = (newDisabled: boolean) => {
+    const actions = (
+      <>
+        <Button
+          variant="secondary"
+          size="sm"
+          className={styles.iconTextButton}
+          onClick={() => void handleRefresh()}
+          disabled={workbench.isFetching}
+        >
+          {workbench.isFetching ? (
+            <IconLoader2 size={14} className={styles.spin} />
+          ) : (
+            <IconRefreshCw size={14} />
+          )}
+          {workbench.isFetching
+            ? t('providersPage.actions.syncing')
+            : t('providersPage.actions.refresh')}
+        </Button>
+        {!fixedBrand ? (
+          <Button
+            size="sm"
+            className={styles.iconTextButton}
+            onClick={openCreate}
+            disabled={newDisabled}
+          >
+            <IconPlus size={14} />
+            {t('providersPage.actions.new')}
+          </Button>
+        ) : null}
+      </>
+    );
+    if (embedded) {
+      return <div className={styles.embeddedToolbar}>{actions}</div>;
+    }
+    return <PageHeader title={headerTitle} actions={actions} />;
+  };
+
   // 加载状态
   if (!workbench.snapshot && workbench.isPending) {
     return (
-      <div className={styles.page}>
-        <Skeleton height={120} />
+      <div className={pageClassName}>
+        {embedded ? null : <Skeleton height={32} />}
         <div className={styles.layout}>
           <Skeleton height={420} />
           <Skeleton height={420} />
@@ -387,42 +407,16 @@ export function ProvidersWorkbenchPage({ fixedBrand }: ProvidersWorkbenchPagePro
 
   if (!activeGroup) {
     return (
-      <div className={styles.page}>
-        <ProviderHeaderCard
-          title={headerTitle}
-          totalActive={0}
-          totalResources={0}
-          providerFamilies={0}
-          updatedAtLabel={updatedAtLabel}
-          isFetching={workbench.isFetching}
-          onRefresh={() => void handleRefresh()}
-          onNew={() => {}}
-          isNewDisabled
-          showNewAction={!fixedBrand}
-          showSummary={fixedBrand !== 'apikeyFun'}
-        />
+      <div className={pageClassName}>
+        {renderHeader(true)}
         {errorBanner}
       </div>
     );
   }
 
   return (
-    <div className={styles.page}>
-      <ProviderHeaderCard
-        title={headerTitle}
-        totalActive={totalActive}
-        totalResources={totalResources}
-        providerFamilies={providerFamilies}
-        updatedAtLabel={updatedAtLabel}
-        isFetching={workbench.isFetching}
-        isNewDisabled={disableMutations}
-        showNewAction={!fixedBrand}
-        showSummary={fixedBrand !== 'apikeyFun'}
-        newLabel={t('providersPage.actions.new')}
-        variant={fixedBrand === 'apikeyFun' ? 'quickStart' : undefined}
-        onRefresh={() => void handleRefresh()}
-        onNew={openCreate}
-      />
+    <div className={pageClassName}>
+      {renderHeader(disableMutations)}
 
       {errorBanner}
 

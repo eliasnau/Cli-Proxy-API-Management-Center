@@ -100,6 +100,7 @@
     "status": "Trạng thái kết nối:"
   },
   "nav": {
+    "accounts": "Accounts",
     "dashboard": "Bảng điều khiển",
     "quick_start": "Bắt đầu nhanh",
     "ai_providers": "AI Provider",
@@ -115,6 +116,8 @@
     "devices": "Mức sử dụng"
   },
   "nav_groups": {
+    "primary": "Navigation",
+    "more": "More",
     "operate": "Vận hành",
     "gateway": "Gateway",
     "observe": "Giám sát",
@@ -122,6 +125,7 @@
     "control": "Điều khiển"
   },
   "nav_meta": {
+    "accounts": "Providers, auth files & OAuth",
     "dashboard": "Tổng quan vận hành",
     "quick_start": "Thiết lập APIKEY.FUN",
     "ai_providers": "Định tuyến model upstream",
@@ -137,6 +141,20 @@
     "devices": "Khóa & hạn mức"
   },
   "dashboard": {
+    "routing_title": "Routing",
+    "routing_open": "Open routing",
+    "routing_saved": "Routing settings saved",
+    "routing_save_failed": "Could not save routing settings",
+    "routing_load_failed": "Could not load routing settings",
+    "devices_title": "Devices",
+    "devices_open": "Open usage",
+    "devices_empty": "No device keys yet. Add one on the Usage page.",
+    "devices_load_failed": "Could not load devices",
+    "devices_all_access": "All accounts",
+    "devices_disabled": "Disabled",
+    "devices_spend": "{{spent}} of {{limit}}",
+    "devices_spend_unlimited": "{{spent}} · no limit",
+    "devices_spend_aria": "Monthly spend of {{name}}",
     "hero_verdict_good": "Mọi hệ thống ổn định",
     "hero_verdict_warning": "Có chút trục trặc nhỏ",
     "hero_verdict_critical": "Cần chú ý",
@@ -222,6 +240,18 @@
     "routing_strategy_round_robin": "round-robin (luân phiên)",
     "routing_strategy_weighted_round_robin": "weighted-round-robin (luân phiên có trọng số)",
     "routing_strategy_fill_first": "fill-first (ưu tiên lấp đầy)"
+  },
+  "accounts": {
+    "title": "Tài khoản",
+    "subtitle": "Tài khoản nhà cung cấp đã kết nối, thông tin xác thực OAuth và khóa API",
+    "add": "Thêm tài khoản",
+    "tab_auth_files": "Tệp xác thực",
+    "tab_providers": "Nhà cung cấp API",
+    "tab_add": "Thêm tài khoản",
+    "add_oauth_title": "Đăng nhập bằng OAuth",
+    "add_file_hint": "Đã có tệp JSON thông tin xác thực? Hãy tải lên.",
+    "add_provider_hint": "Dùng khóa API? Thêm dưới dạng nhà cung cấp API.",
+    "add_provider_action": "Thêm nhà cung cấp API"
   },
   "auth_files": {
     "title": "Quản lý File xác thực",
@@ -2433,6 +2463,27 @@
     "expired": "Phiên liên kết đã hết hạn. Hãy bắt đầu lại."
   },
   "devices": {
+    "access_title": "Access",
+    "access_hint": "Choose which subscriptions may serve this device. Requests are only routed; nothing sent upstream changes.",
+    "access_providers": "Providers",
+    "access_all_providers": "All",
+    "access_accounts": "Specific accounts",
+    "access_any_account": "Any account",
+    "access_selected": "{{count}} selected",
+    "access_loading": "Loading accounts...",
+    "access_load_failed": "Could not load accounts",
+    "access_no_accounts": "No accounts available",
+    "access_account_off": "disabled",
+    "access_models": "Allowed models",
+    "access_models_hint": "Optional. Comma separated, * wildcards allowed. Empty allows every model.",
+    "access_badge_only": "{{provider}} only",
+    "access_badge_accounts_one": "{{count}} account",
+    "access_badge_accounts_other": "{{count}} accounts",
+    "access_badge_models_one": "{{count}} model rule",
+    "access_badge_models_other": "{{count}} model rules",
+    "access_detail_providers": "Providers: {{list}}",
+    "access_detail_accounts": "Accounts: {{list}}",
+    "access_detail_models": "Models: {{list}}",
     "title": "Mức sử dụng",
     "description": "Give each device its own API key and cap how much it can spend per month. Upstream requests are unchanged.",
     "add": "Add device",

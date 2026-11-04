@@ -100,6 +100,7 @@
     "status": "连接状态:"
   },
   "nav": {
+    "accounts": "账号",
     "dashboard": "仪表盘",
     "quick_start": "快速开始",
     "ai_providers": "AI 提供商",
@@ -115,6 +116,8 @@
     "devices": "用量"
   },
   "nav_groups": {
+    "primary": "导航",
+    "more": "更多",
     "operate": "运行",
     "gateway": "网关",
     "observe": "观测",
@@ -122,6 +125,7 @@
     "control": "控制"
   },
   "nav_meta": {
+    "accounts": "提供商、认证文件与 OAuth",
     "dashboard": "运行总览",
     "quick_start": "快速配置",
     "ai_providers": "上游模型路由",
@@ -137,6 +141,20 @@
     "devices": "密钥与消费限额"
   },
   "dashboard": {
+    "routing_title": "Routing",
+    "routing_open": "Open routing",
+    "routing_saved": "Routing settings saved",
+    "routing_save_failed": "Could not save routing settings",
+    "routing_load_failed": "Could not load routing settings",
+    "devices_title": "Devices",
+    "devices_open": "Open usage",
+    "devices_empty": "No device keys yet. Add one on the Usage page.",
+    "devices_load_failed": "Could not load devices",
+    "devices_all_access": "All accounts",
+    "devices_disabled": "Disabled",
+    "devices_spend": "{{spent}} of {{limit}}",
+    "devices_spend_unlimited": "{{spent}} · no limit",
+    "devices_spend_aria": "Monthly spend of {{name}}",
     "hero_verdict_good": "运行平稳",
     "hero_verdict_warning": "略有波动",
     "hero_verdict_critical": "需要留意",
@@ -222,6 +240,18 @@
     "routing_strategy_round_robin": "round-robin (轮询)",
     "routing_strategy_weighted_round_robin": "weighted-round-robin (加权轮询)",
     "routing_strategy_fill_first": "fill-first (优先填充)"
+  },
+  "accounts": {
+    "title": "账号",
+    "subtitle": "已连接的提供商账号、OAuth 凭证与 API 密钥",
+    "add": "添加账号",
+    "tab_auth_files": "认证文件",
+    "tab_providers": "API 提供商",
+    "tab_add": "添加账号",
+    "add_oauth_title": "通过 OAuth 登录",
+    "add_file_hint": "已有凭证 JSON 文件？直接上传即可。",
+    "add_provider_hint": "使用 API 密钥？将其添加为 API 提供商。",
+    "add_provider_action": "添加 API 提供商"
   },
   "auth_files": {
     "title": "认证文件管理",
@@ -2425,6 +2455,27 @@
     "expired": "绑定会话已过期，请重新开始。"
   },
   "devices": {
+    "access_title": "Access",
+    "access_hint": "Choose which subscriptions may serve this device. Requests are only routed; nothing sent upstream changes.",
+    "access_providers": "Providers",
+    "access_all_providers": "All",
+    "access_accounts": "Specific accounts",
+    "access_any_account": "Any account",
+    "access_selected": "{{count}} selected",
+    "access_loading": "Loading accounts...",
+    "access_load_failed": "Could not load accounts",
+    "access_no_accounts": "No accounts available",
+    "access_account_off": "disabled",
+    "access_models": "Allowed models",
+    "access_models_hint": "Optional. Comma separated, * wildcards allowed. Empty allows every model.",
+    "access_badge_only": "{{provider}} only",
+    "access_badge_accounts_one": "{{count}} account",
+    "access_badge_accounts_other": "{{count}} accounts",
+    "access_badge_models_one": "{{count}} model rule",
+    "access_badge_models_other": "{{count}} model rules",
+    "access_detail_providers": "Providers: {{list}}",
+    "access_detail_accounts": "Accounts: {{list}}",
+    "access_detail_models": "Models: {{list}}",
     "title": "用量",
     "description": "为每台设备分配独立的 API 密钥并限制每月消费。上游请求保持不变。",
     "add": "添加设备",

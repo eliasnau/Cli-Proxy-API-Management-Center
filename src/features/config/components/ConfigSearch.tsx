@@ -124,7 +124,7 @@ export function ConfigSearch({ disabled = false, onJump }: ConfigSearchProps) {
         }}
         rightElement={
           <span className={styles.searchIcon} aria-hidden="true">
-            <IconSearch size={16} />
+            <IconSearch size={14} />
           </span>
         }
       />

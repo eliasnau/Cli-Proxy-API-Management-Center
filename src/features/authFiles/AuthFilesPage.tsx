@@ -8,6 +8,9 @@ import { usePageTransitionLayer } from '@/components/common/PageTransitionLayer'
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { IconRefreshCw, IconUpload } from '@/components/ui/icons';
+import { Notice, PageHeader } from '@/components/page';
 import { copyToClipboard } from '@/utils/clipboard';
 import { getQuotaCacheKey } from '@/utils/quota/identity';
 import {
@@ -31,8 +34,6 @@ import { BatchActionBar } from '@/features/authFiles/components/BatchActionBar';
 import { OAuthExcludedCard } from '@/features/authFiles/components/OAuthExcludedCard';
 import { OAuthModelAliasCard } from '@/features/authFiles/components/OAuthModelAliasCard';
 import { ProviderTabs } from '@/features/authFiles/components/ProviderTabs';
-import { VaultHeader } from '@/features/authFiles/components/VaultHeader';
-import { VaultPulse } from '@/features/authFiles/components/VaultPulse';
 import { invalidateAuthFileDerivedCaches } from '@/features/authFiles/cacheInvalidation';
 import {
   buildWildcardSearch,
@@ -77,7 +78,25 @@ const normalizePersistedStatusFilterMode = (value: unknown): AuthFilesStatusFilt
   return isAuthFilesStatusFilterMode(value) ? value : null;
 };
 
-export function AuthFilesPage() {
+export interface AuthFilesPageProps {
+  /**
+   * Rendered inside another page (Accounts): no own PageHeader title; header actions
+   * move into a small right-aligned toolbar row.
+   */
+  embedded?: boolean;
+  /** When true on mount/update, opens the upload file picker once, then calls onAutoUploadHandled. */
+  autoUpload?: boolean;
+  onAutoUploadHandled?: () => void;
+  /** Where "log in with OAuth" in the empty state goes. Defaults to navigating to /oauth. */
+  onOpenOAuth?: () => void;
+}
+
+export function AuthFilesPage({
+  embedded = false,
+  autoUpload = false,
+  onAutoUploadHandled,
+  onOpenOAuth,
+}: AuthFilesPageProps = {}) {
   const { t } = useTranslation();
   const showNotification = useNotificationStore((state) => state.showNotification);
   const connectionStatus = useAuthStore((state) => state.connectionStatus);
@@ -155,6 +174,12 @@ export function AuthFilesPage() {
   } = useAuthFilesData({ onFilesMutated: invalidateDerivedCaches });
 
   const statusBarCache = useAuthFilesStatusBarCache(files);
+
+  useEffect(() => {
+    if (!autoUpload) return;
+    handleUploadClick();
+    onAutoUploadHandled?.();
+  }, [autoUpload, handleUploadClick, onAutoUploadHandled]);
 
   const {
     excluded,
@@ -480,9 +505,8 @@ export function AuthFilesPage() {
     batchStatusUpdating ||
     selectedHasStatusUpdating;
 
-  /* ---------- 头部遥测计数 ---------- */
+  /* ---------- 问题凭证计数（Notice） ---------- */
 
-  const activeCount = useMemo(() => files.filter((file) => file.disabled !== true).length, [files]);
   const problemCount = useMemo(() => files.filter(isProblemAuthFile).length, [files]);
 
   /* ---------- 首屏卡片一次性级联入场 ----------
@@ -584,22 +608,66 @@ export function AuthFilesPage() {
     .filter(Boolean)
     .join(' ');
 
+  const credentialRefreshDisabled = Object.keys(manualRefreshing).length > 0;
+  const headerActions = (
+    <>
+      <Button
+        variant="ghost"
+        size="sm"
+        className={styles.iconTextButton}
+        onClick={handleRefreshAllCredentials}
+        disabled={
+          disableControls || loading || refreshingAllCredentials || credentialRefreshDisabled
+        }
+      >
+        {refreshingAllCredentials ? <LoadingSpinner size={14} /> : <IconRefreshCw size={14} />}
+        {t('auth_files.refresh_all_button')}
+      </Button>
+      <Button
+        variant="secondary"
+        size="sm"
+        className={styles.iconTextButton}
+        onClick={() => void handleHeaderRefresh()}
+        disabled={loading || refreshing}
+      >
+        <IconRefreshCw size={14} className={refreshing ? styles.spinning : undefined} />
+        {t('common.refresh')}
+      </Button>
+      <Button
+        size="sm"
+        className={styles.iconTextButton}
+        onClick={handleUploadClick}
+        disabled={disableControls || uploading}
+      >
+        {uploading ? <LoadingSpinner size={14} /> : <IconUpload size={14} />}
+        {t('auth_files.upload_button')}
+      </Button>
+    </>
+  );
+
   return (
     <div className={styles.page}>
-      <VaultHeader
-        totalCount={files.length}
-        activeCount={activeCount}
-        problemCount={problemCount}
-        loading={loading}
-        refreshing={refreshing}
-        uploading={uploading}
-        disableControls={disableControls}
-        onUpload={handleUploadClick}
-        onRefresh={() => void handleHeaderRefresh()}
-        refreshingCredentials={refreshingAllCredentials}
-        credentialRefreshDisabled={Object.keys(manualRefreshing).length > 0}
-        onRefreshCredentials={handleRefreshAllCredentials}
-      />
+      {embedded ? (
+        <div className={styles.embeddedToolbar}>{headerActions}</div>
+      ) : (
+        <PageHeader title={t('auth_files.title')} actions={headerActions} />
+      )}
+      {problemCount > 0 && statusFilterMode !== 'problem' && (
+        <Notice
+          tone="warning"
+          action={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleStatusFilterModeChange('problem')}
+            >
+              {t('auth_files.problem_filter_problem')}
+            </Button>
+          }
+        >
+          {t('auth_files.meta_problem', { count: problemCount })}
+        </Notice>
+      )}
       <AuthFileRefreshResults results={refreshResults} onClose={closeRefreshResults} />
       <input
         ref={fileInputRef}
@@ -609,8 +677,6 @@ export function AuthFilesPage() {
         style={{ display: 'none' }}
         onChange={handleFileChange}
       />
-
-      <VaultPulse files={files} statusBarCache={statusBarCache} />
 
       <section className={styles.workbench} aria-label={t('auth_files.title_section')}>
         <ProviderTabs
@@ -658,16 +724,12 @@ export function AuthFilesPage() {
           }
         />
 
-        {error && (
-          <div className={styles.errorBanner} role="alert">
-            {error}
-          </div>
-        )}
+        {error && <Notice tone="error">{error}</Notice>}
 
         {loading ? (
           <div className={gridClasses} aria-hidden="true">
             {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
-              <Skeleton key={index} height={206} rounded={14} />
+              <Skeleton key={index} height={180} rounded={8} />
             ))}
           </div>
         ) : isFirstRunEmpty ? (
@@ -683,7 +745,11 @@ export function AuthFilesPage() {
                 >
                   {t('auth_files.upload_button')}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/oauth')}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => (onOpenOAuth ? onOpenOAuth() : navigate('/oauth'))}
+                >
                   {t('auth_files.empty_oauth_link')}
                 </Button>
               </div>

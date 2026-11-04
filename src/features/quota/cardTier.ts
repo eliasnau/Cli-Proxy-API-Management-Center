@@ -1,6 +1,6 @@
 /**
  * 套餐档位：跨 provider 的统一阶梯，决定套餐文字的样式
- * （flagship = 和田玉金镶玉 elitePlanValue，premium = 金卡 premiumPlanValue）。
+ * （flagship = elitePlanValue，premium = premiumPlanValue）。
  *
  * 规则：各家最高个人档 = flagship；其下的付费个人档 = premium；入门付费档、
  * 团队/商业套餐与免费档 = standard。

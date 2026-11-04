@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PageHeader } from '@/components/page';
 import { AutocompleteInput } from '@/components/ui/AutocompleteInput';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -381,11 +382,7 @@ export function RoutingPage() {
 
   return (
     <div className={styles.page} ref={revealRef}>
-      <header className={styles.header}>
-        <h1 className={styles.title} data-reveal>
-          {t('routing.title')}
-        </h1>
-      </header>
+      <PageHeader title={t('routing.title')} subtitle={t('nav_meta.routing')} />
 
       {renderBody()}
 

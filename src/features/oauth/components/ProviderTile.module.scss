@@ -1,7 +1,7 @@
 @use '../../../styles/mixins' as *;
 
 /* ============================================================
- * 提供商磁贴 — 凭证卡/额度卡同一配方（14px 圆角 / 1px 边框 / 82% 透感纸面）。
+ * 提供商磁贴 — 扁平紧凑行（8px 圆角 / 1px 边框 / 纸面底色）。
  * 品牌身份只由图标承载；状态走副行文字 + 小圆点（颜色只是辅助通道）。
  * ============================================================ */
 
@@ -10,35 +10,29 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
-  min-height: 66px;
-  padding: 12px 14px 12px 12px;
-  border-radius: 14px;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 10px;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
-  background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+  background: var(--bg-primary);
   transition:
-    transform var(--dur-press, 160ms) var(--ease-out-strong, ease-out),
     border-color var(--dur-hover, 200ms) var(--ease-out-strong, ease-out),
-    box-shadow var(--dur-hover, 200ms) var(--ease-out-strong, ease-out);
-  /* backwards：只在延迟期间持有起始帧，结束后不压住 hover/press 的 transform */
-  animation: oauth-tile-in 0.45s var(--ease-out-strong, ease-out) backwards;
+    background-color var(--dur-hover, 200ms) var(--ease-out-strong, ease-out);
+  /* backwards：只在延迟期间持有起始帧 */
+  animation: oauth-tile-in 0.3s var(--ease-out-strong, ease-out) backwards;
   animation-delay: var(--tile-delay, 0ms);
-
-  &:active {
-    transform: scale(0.985);
-  }
 }
 
 @keyframes oauth-tile-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 12px, 0);
   }
 }
 
 /* 进行中的磁贴边框略加深：扫一眼就能找到「还没完成」的那个 */
 .tile[data-status='waiting'] {
-  border-color: color-mix(in srgb, var(--text-primary) 24%, var(--border-color));
+  border-color: var(--border-hover);
 }
 
 /* ---------- 图标 ---------- */
@@ -47,18 +41,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--bg-tertiary) 70%, transparent);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: var(--bg-tertiary);
   color: var(--text-secondary);
   flex-shrink: 0;
 }
 
 .glyphImage {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
 }
 
@@ -67,7 +61,7 @@
 .text {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
   min-width: 0;
 }
 
@@ -78,17 +72,16 @@
   display: block;
   max-width: 100%;
   text-align: left;
-  font-size: 14.5px;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.35;
   color: var(--text-primary);
 
   &::after {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 14px;
+    border-radius: 8px;
   }
 
   &:focus {
@@ -106,11 +99,8 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
-  font-family: $font-mono;
-  font-size: 11.5px;
-  font-weight: 500;
+  font-size: 12px;
   line-height: 1.4;
-  letter-spacing: 0.02em;
   color: var(--text-tertiary);
   white-space: nowrap;
 }
@@ -166,46 +156,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1px solid var(--border-color);
+  width: 24px;
+  height: 24px;
   color: var(--text-tertiary);
-  transition:
-    background-color var(--dur-hover, 200ms) var(--ease-out-strong, ease-out),
-    border-color var(--dur-hover, 200ms) var(--ease-out-strong, ease-out),
-    color var(--dur-hover, 200ms) var(--ease-out-strong, ease-out);
+  transition: color var(--dur-hover, 200ms) var(--ease-out-strong, ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .tile:hover {
-    transform: translateY(-1px);
     border-color: var(--border-hover);
-    box-shadow: 0 12px 26px -16px rgb(0 0 0 / 0.18);
+    background: var(--bg-secondary);
   }
 
   .tile:hover .trail {
-    background: var(--text-primary);
-    border-color: var(--text-primary);
-    color: var(--bg-secondary);
-  }
-
-  .tile:active {
-    transform: scale(0.985);
+    color: var(--primary-color);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .tile {
     animation: none;
-    transition:
-      border-color var(--dur-hover, 200ms) ease,
-      box-shadow var(--dur-hover, 200ms) ease;
-  }
-
-  .tile:active,
-  .tile:hover {
-    transform: none;
+    transition: none;
   }
 
   .tile[data-status='waiting'] .statusDot {

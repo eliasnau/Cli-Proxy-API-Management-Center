@@ -127,7 +127,7 @@ textarea {
   border: 1px solid var(--border-color);
   border-radius: $radius-lg;
   box-shadow: none;
-  padding: $spacing-lg;
+  padding: $spacing-md;
 }
 
 .card-header {
@@ -136,7 +136,7 @@ textarea {
   justify-content: space-between;
   gap: $spacing-sm;
   flex-wrap: wrap;
-  margin-bottom: $spacing-md;
+  margin-bottom: 12px;
 
   > * {
     min-width: 0;
@@ -145,7 +145,7 @@ textarea {
   .title {
     flex: 1 1 auto;
     min-width: 0;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
   }
@@ -437,56 +437,51 @@ textarea {
 }
 
 .empty-state {
-  border: 1px dashed var(--border-color);
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  background: var(--bg-secondary);
   display: flex;
-  justify-content: space-between;
-  gap: $spacing-md;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--text-secondary);
 
   .empty-content {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: $spacing-md;
+    gap: 6px;
   }
 
   .empty-icon {
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
-    border-radius: $radius-full;
-    border: 2px solid var(--border-color);
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    color: var(--text-tertiary);
     line-height: 0;
-    color: var(--text-secondary);
 
     svg {
       display: block;
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
     }
   }
 
   .empty-title {
-    font-weight: 700;
+    font-size: 13.5px;
+    font-weight: 500;
     color: var(--text-primary);
   }
 
   .empty-desc {
+    margin-top: 2px;
+    font-size: 13px;
     color: var(--text-secondary);
-    margin-top: 4px;
   }
 
   .empty-action .btn > span {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     line-height: 1;
   }
 
@@ -505,7 +500,7 @@ textarea {
 .item-row {
   border: 1px solid var(--border-color);
   border-radius: $radius-md;
-  padding: $spacing-md;
+  padding: 10px 12px;
   background: var(--bg-primary);
   display: flex;
   align-items: center;
@@ -520,7 +515,7 @@ textarea {
   }
 
   .item-title {
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-primary);
   }
 
@@ -539,11 +534,12 @@ textarea {
 }
 
 .error-box {
-  background: rgba($error-color, 0.1);
-  border: 1px solid rgba($error-color, 0.4);
+  background: var(--bg-primary);
+  border: 1px solid var(--failure-badge-border);
   border-radius: $radius-md;
-  padding: $spacing-sm $spacing-md;
-  color: $error-color;
+  padding: 8px 12px;
+  color: var(--failure-badge-text);
+  font-size: 13px;
 }
 
 .stack {

@@ -53,7 +53,7 @@ export function SourceSearchBar({ search, disabled }: SourceSearchBarProps) {
                 disabled={!searchQuery || disabled}
                 title={t('config_management.search_button')}
               >
-                <IconSearch size={16} />
+                <IconSearch size={14} />
               </button>
             </div>
           }
@@ -68,7 +68,7 @@ export function SourceSearchBar({ search, disabled }: SourceSearchBarProps) {
           disabled={!searchQuery || lastSearchedQuery !== searchQuery || searchResults.total === 0}
           title={t('config_management.search_prev')}
         >
-          <IconChevronUp size={16} />
+          <IconChevronUp size={14} />
         </Button>
         <Button
           variant="secondary"
@@ -77,7 +77,7 @@ export function SourceSearchBar({ search, disabled }: SourceSearchBarProps) {
           disabled={!searchQuery || lastSearchedQuery !== searchQuery || searchResults.total === 0}
           title={t('config_management.search_next')}
         >
-          <IconChevronDown size={16} />
+          <IconChevronDown size={14} />
         </Button>
       </div>
     </div>

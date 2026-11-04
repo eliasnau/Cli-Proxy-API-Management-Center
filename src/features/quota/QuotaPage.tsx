@@ -13,17 +13,16 @@ import { useTranslation } from 'react-i18next';
 import { authFilesApi } from '@/services/api';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { IconSearch, IconX } from '@/components/ui/icons';
+import { IconRefreshCw, IconSearch, IconX } from '@/components/ui/icons';
+import { Notice, PageHeader, Tabs, type TabItem } from '@/components/page';
 import { Select } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useHeaderRefresh } from '@/hooks/useHeaderRefresh';
 import { useNow } from '@/hooks/useNow';
-import { useRevealGroup } from '@/hooks/motion';
 import { useAuthStore, useQuotaStore, useThemeStore } from '@/stores';
 import type { AuthFileItem, ResolvedTheme } from '@/types';
 import { getQuotaCacheKey } from '@/utils/quota/identity';
-import { ProviderTabs } from '@/features/authFiles/components/ProviderTabs';
-import { QuotaHeader } from './components/QuotaHeader';
+import { getTypeLabel } from '@/features/authFiles/constants';
 import { QuotaCard } from './components/QuotaCard';
 import { QuotaTimeline } from './components/QuotaTimeline';
 import {
@@ -53,7 +52,7 @@ import { useQuotaBatchLoader } from './hooks/useQuotaBatchLoader';
 import { readQuotaUiState, writeQuotaUiState } from './uiState';
 import styles from './QuotaPage.module.scss';
 
-const TAB_IDS: string[] = ['all', ...QUOTA_TAB_ORDER];
+const TAB_IDS: QuotaTabId[] = ['all', ...QUOTA_TAB_ORDER];
 const SKELETON_CARD_COUNT = 6;
 
 /**
@@ -77,8 +76,6 @@ export function QuotaPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
-  // 页头 + tabs 的入场级联（标题 → meta → 动作 → tabs，级差 70ms）
-  const revealRef = useRevealGroup<HTMLDivElement>();
 
   const disableControls = connectionStatus !== 'connected';
 
@@ -196,6 +193,17 @@ export function QuotaPage() {
   const { pageItems, currentPage, totalPages } = useMemo(
     () => paginate(sortedEntries, page, QUOTA_PAGE_SIZE),
     [sortedEntries, page]
+  );
+
+  // Providers without credentials stay out of the tab row unless already selected.
+  const tabItems = useMemo<TabItem<QuotaTabId>[]>(
+    () =>
+      TAB_IDS.filter((id) => id === 'all' || id === tab || (tabCounts[id] ?? 0) > 0).map((id) => ({
+        id,
+        label: id === 'all' ? t('auth_files.filter_all') : getTypeLabel(t, id),
+        badge: tabCounts[id] ?? 0,
+      })),
+    [t, tab, tabCounts]
   );
 
   const handleTabChange = useCallback((next: string) => {
@@ -324,31 +332,45 @@ export function QuotaPage() {
   const isEmpty = !loading && filteredEntries.length === 0;
 
   return (
-    <div className={styles.page} ref={revealRef}>
-      <QuotaHeader
-        totalCount={entries.length}
-        loadedCount={loadedCount}
-        attentionCount={attentionCount}
-        refreshing={loading || batchLoading}
-        disableControls={disableControls}
-        onRefreshAll={handleRefreshAll}
-      />
+    <div className={styles.page}>
+      <PageHeader
+        title={t('quota_management.title')}
+        subtitle={[
+          t('quota_management.meta_credentials', { count: entries.length }),
+          t('quota_management.meta_loaded', { count: loadedCount }),
+          ...(attentionCount > 0
+            ? [t('quota_management.meta_attention', { count: attentionCount })]
+            : []),
+        ].join(' · ')}
+        actions={
+          <Button
+            variant="secondary"
+            size="sm"
+            className={styles.headerButton}
+            onClick={handleRefreshAll}
+            disabled={disableControls || loading || batchLoading}
+          >
+            <IconRefreshCw
+              size={14}
+              className={loading || batchLoading ? styles.spinning : undefined}
+              aria-hidden="true"
+            />
+            {t('quota_management.refresh_all_credentials')}
+          </Button>
+        }
+      >
+        <Tabs
+          items={tabItems}
+          value={tab}
+          onChange={handleTabChange}
+          ariaLabel={t('auth_files.filter_all')}
+        />
+      </PageHeader>
 
       <section className={styles.workbench}>
-        {/* 提供商导航与搜索工具栏分层，避免不同控件争夺视觉焦点。 */}
-        <div className={styles.tabsRow} data-reveal>
-          <ProviderTabs
-            types={TAB_IDS}
-            counts={tabCounts}
-            active={tab}
-            resolvedTheme={resolvedTheme}
-            onChange={handleTabChange}
-          />
-        </div>
-
         <div className={styles.toolbar}>
           <div className={styles.search}>
-            <IconSearch size={16} className={styles.searchIcon} aria-hidden="true" />
+            <IconSearch size={14} className={styles.searchIcon} aria-hidden="true" />
             <input
               ref={searchInputRef}
               className={styles.searchInput}
@@ -384,16 +406,12 @@ export function QuotaPage() {
           </div>
         </div>
 
-        {error && (
-          <div className={styles.errorBanner} role="alert">
-            {error}
-          </div>
-        )}
+        {error && <Notice tone="error">{error}</Notice>}
 
         {loading ? (
           <div className={styles.grid} aria-hidden="true">
             {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
-              <Skeleton key={index} height={168} rounded={14} />
+              <Skeleton key={index} height={132} rounded={8} />
             ))}
           </div>
         ) : isEmpty ? (

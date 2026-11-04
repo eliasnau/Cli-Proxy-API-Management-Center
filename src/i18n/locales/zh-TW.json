@@ -100,6 +100,7 @@
     "status": "連線狀態:"
   },
   "nav": {
+    "accounts": "帳號",
     "dashboard": "儀表板",
     "quick_start": "快速開始",
     "ai_providers": "AI 供應商",
@@ -115,6 +116,8 @@
     "devices": "用量"
   },
   "nav_groups": {
+    "primary": "導覽",
+    "more": "更多",
     "operate": "運行",
     "gateway": "閘道",
     "observe": "觀測",
@@ -122,6 +125,7 @@
     "control": "控制"
   },
   "nav_meta": {
+    "accounts": "供應商、認證檔案與 OAuth",
     "dashboard": "運行總覽",
     "quick_start": "APIKEY.FUN 快速設定",
     "ai_providers": "上游模型路由",
@@ -137,6 +141,20 @@
     "devices": "金鑰與消費限額"
   },
   "dashboard": {
+    "routing_title": "Routing",
+    "routing_open": "Open routing",
+    "routing_saved": "Routing settings saved",
+    "routing_save_failed": "Could not save routing settings",
+    "routing_load_failed": "Could not load routing settings",
+    "devices_title": "Devices",
+    "devices_open": "Open usage",
+    "devices_empty": "No device keys yet. Add one on the Usage page.",
+    "devices_load_failed": "Could not load devices",
+    "devices_all_access": "All accounts",
+    "devices_disabled": "Disabled",
+    "devices_spend": "{{spent}} of {{limit}}",
+    "devices_spend_unlimited": "{{spent}} · no limit",
+    "devices_spend_aria": "Monthly spend of {{name}}",
     "hero_verdict_good": "運行平穩",
     "hero_verdict_warning": "略有波動",
     "hero_verdict_critical": "需要留意",
@@ -222,6 +240,18 @@
     "routing_strategy_round_robin": "round-robin（輪詢）",
     "routing_strategy_weighted_round_robin": "weighted-round-robin（加權輪詢）",
     "routing_strategy_fill_first": "fill-first（優先填充）"
+  },
+  "accounts": {
+    "title": "帳號",
+    "subtitle": "已連線的提供商帳號、OAuth 憑證與 API 金鑰",
+    "add": "新增帳號",
+    "tab_auth_files": "認證檔案",
+    "tab_providers": "API 提供商",
+    "tab_add": "新增帳號",
+    "add_oauth_title": "透過 OAuth 登入",
+    "add_file_hint": "已有憑證 JSON 檔案？直接上傳即可。",
+    "add_provider_hint": "使用 API 金鑰？將其新增為 API 提供商。",
+    "add_provider_action": "新增 API 提供商"
   },
   "auth_files": {
     "title": "驗證檔案管理",
@@ -2453,6 +2483,27 @@
     "expired": "綁定工作階段已過期，請重新開始。"
   },
   "devices": {
+    "access_title": "Access",
+    "access_hint": "Choose which subscriptions may serve this device. Requests are only routed; nothing sent upstream changes.",
+    "access_providers": "Providers",
+    "access_all_providers": "All",
+    "access_accounts": "Specific accounts",
+    "access_any_account": "Any account",
+    "access_selected": "{{count}} selected",
+    "access_loading": "Loading accounts...",
+    "access_load_failed": "Could not load accounts",
+    "access_no_accounts": "No accounts available",
+    "access_account_off": "disabled",
+    "access_models": "Allowed models",
+    "access_models_hint": "Optional. Comma separated, * wildcards allowed. Empty allows every model.",
+    "access_badge_only": "{{provider}} only",
+    "access_badge_accounts_one": "{{count}} account",
+    "access_badge_accounts_other": "{{count}} accounts",
+    "access_badge_models_one": "{{count}} model rule",
+    "access_badge_models_other": "{{count}} model rules",
+    "access_detail_providers": "Providers: {{list}}",
+    "access_detail_accounts": "Accounts: {{list}}",
+    "access_detail_models": "Models: {{list}}",
     "title": "用量",
     "description": "Give each device its own API key and cap how much it can spend per month. Upstream requests are unchanged.",
     "add": "Add device",

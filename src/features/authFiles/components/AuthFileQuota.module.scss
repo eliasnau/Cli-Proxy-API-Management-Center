@@ -249,11 +249,8 @@ button.quotaMessageAction {
 }
 
 .antigravityQuotaGroupTitle {
-  font-family: $font-mono;
   font-size: $quota-font-size;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--text-tertiary);
 }
 
@@ -275,11 +272,8 @@ button.quotaMessageAction {
 }
 
 .codexResetCreditsTitle {
-  font-family: $font-mono;
   font-size: $quota-font-size;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--text-tertiary);
 }
 

@@ -1,14 +1,3 @@
-import type { ComponentType } from 'react';
-import {
-  IconCode,
-  IconKey,
-  IconNetwork,
-  IconSatellite,
-  IconScrollText,
-  IconShield,
-  IconSlidersHorizontal,
-  type IconProps,
-} from '@/components/ui/icons';
 import type { VisualConfigFieldPath } from '@/types/visualConfig';
 import type { VisualSectionId } from './searchIndex';
 
@@ -37,16 +26,6 @@ export const SECTION_INDEX_LABELS: Record<VisualSectionId, string> = {
   streaming: '04',
   advanced: '05',
   payload: '06',
-};
-
-export const CONFIG_TAB_ICONS: Record<ConfigTabId, ComponentType<IconProps>> = {
-  common: IconSlidersHorizontal,
-  connectivity: IconKey,
-  network: IconNetwork,
-  logging: IconScrollText,
-  streaming: IconSatellite,
-  advanced: IconShield,
-  payload: IconCode,
 };
 
 /** 常用 tab 的 6 个字段（原简单模式），渲染源与正典分区共享（fields/sharedFields.tsx）。 */

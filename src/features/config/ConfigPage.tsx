@@ -6,6 +6,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useRevealGroup } from '@/hooks/motion';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { useVisualConfig } from '@/hooks/useVisualConfig';
+import { Notice } from '@/components/page';
 import { useAuthStore, useNotificationStore, useThemeStore } from '@/stores';
 import {
   CONFIG_MODE_STORAGE_KEY,
@@ -303,35 +304,25 @@ export function ConfigPage() {
         reloadDisabled={doc.loading || doc.saving}
         reloading={doc.loading}
         onReload={doc.handleReload}
+        extraActions={
+          <ModeSwitch
+            mode={mode}
+            disabled={doc.saving || doc.loading || doc.diffModalOpen || doc.recoveryRequired}
+            onChange={handleModeChange}
+          />
+        }
       />
 
-      {doc.error && (
-        <div className="error-box" role="alert">
-          {doc.error}
-        </div>
-      )}
+      {doc.error && <Notice tone="error">{doc.error}</Notice>}
       {!doc.error && visualParseError && (
-        <div className="error-box" role="alert">
+        <Notice tone="error">
           {t('config_management.visual_mode_unavailable_detail', { message: visualParseError })}
-        </div>
+        </Notice>
       )}
-
-      <div className={styles.toolbar} data-reveal>
-        {mode === 'visual' ? (
-          <ConfigSearch disabled={disableControls || doc.loading} onJump={jumpToField} />
-        ) : (
-          <SourceSearchBar search={sourceSearch} disabled={disableControls || doc.loading} />
-        )}
-        <ModeSwitch
-          mode={mode}
-          disabled={doc.saving || doc.loading || doc.diffModalOpen || doc.recoveryRequired}
-          onChange={handleModeChange}
-        />
-      </div>
 
       {mode === 'visual' ? (
         <>
-          <div className={styles.tabsRow} data-reveal>
+          <div className={styles.toolbar} data-reveal>
             <ConfigTabs
               active={activeSection}
               errorCounts={errorCounts}
@@ -339,6 +330,7 @@ export function ConfigPage() {
               disabled={doc.saving || doc.loading}
               onChange={handleSectionChange}
             />
+            <ConfigSearch disabled={disableControls || doc.loading} onJump={jumpToField} />
           </div>
           <div
             className={styles.panel}
@@ -350,13 +342,18 @@ export function ConfigPage() {
           </div>
         </>
       ) : (
-        <SourcePanel
-          search={sourceSearch}
-          value={doc.content}
-          onChange={doc.handleChange}
-          theme={resolvedTheme}
-          editable={!disableControls && !doc.loading && !doc.saving && !doc.diffModalOpen}
-        />
+        <>
+          <div className={styles.sourceToolbar} data-reveal>
+            <SourceSearchBar search={sourceSearch} disabled={disableControls || doc.loading} />
+          </div>
+          <SourcePanel
+            search={sourceSearch}
+            value={doc.content}
+            onChange={doc.handleChange}
+            theme={resolvedTheme}
+            editable={!disableControls && !doc.loading && !doc.saving && !doc.diffModalOpen}
+          />
+        </>
       )}
 
       <FloatingSaveBar

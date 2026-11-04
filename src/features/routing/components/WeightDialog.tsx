@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Notice } from '@/components/page';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import type { RoutingMember, RoutingStrategy } from '@/types/routing';
@@ -59,13 +60,14 @@ export function WeightDialog({
     >
       <p className={styles.dialogHint}>{t('routing.weight_hint')}</p>
       {strategy !== 'weighted-round-robin' ? (
-        <p className={styles.dialogNotice}>{t('routing.weight_inactive')}</p>
+        <Notice className={styles.dialogNotice}>{t('routing.weight_inactive')}</Notice>
       ) : null}
       <div className={styles.weightList}>
         {member.weights.map((slot, index) => (
           <label key={slot.index} className={styles.weightRow}>
             <span className={styles.weightLabel}>{slot.label}</span>
             <input
+              className={`input ${styles.weightInput}`}
               type="number"
               inputMode="numeric"
               min={0}

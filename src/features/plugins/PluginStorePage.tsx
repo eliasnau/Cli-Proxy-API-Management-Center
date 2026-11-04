@@ -1,21 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { Notice, PageHeader } from '@/components/page';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Select } from '@/components/ui/Select';
 import {
-  IconAlertTriangle,
-  IconDownload,
   IconExternalLink,
   IconGithub,
   IconPlug,
   IconRefreshCw,
   IconSearch,
-  IconSettings,
-  IconShield,
 } from '@/components/ui/icons';
 import { useHeaderRefresh } from '@/hooks/useHeaderRefresh';
 import { pluginStoreApi } from '@/services/api';
@@ -828,6 +825,13 @@ export function PluginStorePage() {
       : '';
     const actionDisabled = !connected || missingAuth || (hasPendingInstall && !isInstalling);
     const actionTitle = missingAuth ? t('plugin_store.auth_required_hint') : undefined;
+    const metaText = [
+      installTypeText ? t('plugin_store.install_type', { type: installTypeText }) : '',
+      platformText,
+      ...metaItems,
+    ]
+      .filter(Boolean)
+      .join(' · ');
 
     return (
       <article key={entryKey} className={styles.card}>
@@ -839,27 +843,30 @@ export function PluginStorePage() {
             <h2 className={styles.cardTitle}>{getStoreEntryTitle(entry)}</h2>
             <span className={styles.cardId}>{entry.id}</span>
           </div>
-          <div className={styles.cardBadges}>
-            {!isOfficial ? (
-              <span className={styles.badgeUntrusted}>
-                <IconAlertTriangle size={11} />
-                {t('plugin_store.badge_untrusted')}
-              </span>
-            ) : null}
-            {isUpdate ? (
-              <span className={styles.badgeWarning}>{t('plugin_store.badge_update')}</span>
-            ) : entry.installed ? (
-              <span className={styles.badgeSuccess}>{t('plugin_store.badge_installed')}</span>
-            ) : null}
-            {entry.installed && entry.effectiveEnabled ? (
-              <span className={styles.badge}>{t('plugin_store.badge_effective')}</span>
-            ) : null}
-            {entry.authRequired ? (
-              <span className={entry.authConfigured ? styles.badge : styles.badgeWarning}>
-                {authText}
-              </span>
-            ) : null}
-          </div>
+        </div>
+
+        <div className={styles.cardBadges}>
+          {!isOfficial ? (
+            <span className={styles.badgeWarning}>{t('plugin_store.badge_untrusted')}</span>
+          ) : null}
+          {isUpdate ? (
+            <span className={styles.badgeWarning}>{t('plugin_store.badge_update')}</span>
+          ) : entry.installed ? (
+            <span className={styles.badgeSuccess}>{t('plugin_store.badge_installed')}</span>
+          ) : null}
+          {entry.installed && entry.effectiveEnabled ? (
+            <span className={styles.badge}>{t('plugin_store.badge_effective')}</span>
+          ) : null}
+          {entry.authRequired ? (
+            <span className={entry.authConfigured ? styles.badge : styles.badgeWarning}>
+              {authText}
+            </span>
+          ) : null}
+          {entry.tags.map((tag) => (
+            <span key={`${entryKey}-tag-${tag}`} className={styles.badge}>
+              {tag}
+            </span>
+          ))}
         </div>
 
         {entry.description ? (
@@ -891,31 +898,10 @@ export function PluginStorePage() {
           </div>
         ) : null}
 
-        {metaItems.length > 0 || installTypeText || platformText ? (
-          <div className={styles.cardMeta}>
-            {installTypeText ? (
-              <span className={styles.metaItem}>
-                {t('plugin_store.install_type', { type: installTypeText })}
-              </span>
-            ) : null}
-            {platformText ? <span className={styles.metaItem}>{platformText}</span> : null}
-            {metaItems.map((item, index) => (
-              <span key={`${entryKey}-meta-${index}`} className={styles.metaItem}>
-                {index > 0 ? <span className={styles.metaDot} aria-hidden="true" /> : null}
-                {index === 0 && versionText ? <strong>{item}</strong> : item}
-              </span>
-            ))}
-          </div>
-        ) : null}
-
-        {entry.tags.length > 0 ? (
-          <div className={styles.tagRow}>
-            {entry.tags.map((tag) => (
-              <span key={`${entryKey}-tag-${tag}`} className={styles.tag}>
-                {tag}
-              </span>
-            ))}
-          </div>
+        {metaText ? (
+          <p className={styles.cardMeta} title={metaText}>
+            {metaText}
+          </p>
         ) : null}
 
         <div className={styles.cardFooter}>
@@ -928,7 +914,6 @@ export function PluginStorePage() {
                 loading={isInstalling}
                 title={actionTitle}
               >
-                <IconDownload size={14} />
                 {t('plugin_store.install')}
               </Button>
             ) : (
@@ -941,12 +926,10 @@ export function PluginStorePage() {
                     loading={isInstalling}
                     title={actionTitle}
                   >
-                    <IconRefreshCw size={14} />
                     {t('plugin_store.update')}
                   </Button>
                 ) : null}
                 <Button variant="secondary" size="sm" onClick={() => navigate('/plugins')}>
-                  <IconSettings size={14} />
                   {t('plugin_store.manage')}
                 </Button>
               </>
@@ -985,36 +968,48 @@ export function PluginStorePage() {
 
   return (
     <div className={styles.page}>
-      {/* ── Page Header ── */}
-      <div className={styles.pageHeader}>
-        <h1 className={styles.title}>{t('plugin_store.title')}</h1>
-        <p className={styles.description}>{t('plugin_store.description')}</p>
+      <PageHeader
+        title={t('plugin_store.title')}
+        subtitle={t('plugin_store.description')}
+        actions={
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={loadStore}
+            disabled={!connected || loading}
+            loading={loading}
+          >
+            <IconRefreshCw size={14} />
+            {t('plugin_store.refresh')}
+          </Button>
+        }
+      />
+
+      <div role="note">
+        <Notice tone="warning">
+          <strong className={styles.noticeTitle}>{t('plugin_store.security_banner_title')}</strong>{' '}
+          {t('plugin_store.security_banner_text')}
+        </Notice>
       </div>
 
-      {/* ── Security Banner ── */}
-      <div className={styles.securityBanner} role="note">
-        <IconShield size={20} />
-        <div className={styles.securityBannerText}>
-          <strong>{t('plugin_store.security_banner_title')}</strong>
-          <p>{t('plugin_store.security_banner_text')}</p>
-        </div>
-      </div>
-
-      {/* ── Alerts ── */}
       {error ? (
-        <div className={styles.errorBox}>
-          <span>{error.message}</span>
-          {error.kind !== 'unsupported' ? (
-            <Button variant="secondary" size="sm" onClick={loadStore} disabled={loading}>
-              {t('plugin_store.retry')}
-            </Button>
-          ) : null}
-        </div>
+        <Notice
+          tone="error"
+          action={
+            error.kind !== 'unsupported' ? (
+              <Button variant="secondary" size="sm" onClick={loadStore} disabled={loading}>
+                {t('plugin_store.retry')}
+              </Button>
+            ) : undefined
+          }
+        >
+          {error.message}
+        </Notice>
       ) : null}
 
       {data?.sourceErrors.length ? (
-        <div className={styles.warningBox}>
-          <strong>{t('plugin_store.source_errors_title')}</strong>
+        <Notice tone="warning">
+          <strong className={styles.noticeTitle}>{t('plugin_store.source_errors_title')}</strong>
           <ul className={styles.sourceErrorList}>
             {data.sourceErrors.map((sourceError, index) => {
               const sourceLabel =
@@ -1027,110 +1022,50 @@ export function PluginStorePage() {
               );
             })}
           </ul>
-        </div>
+        </Notice>
       ) : null}
 
       {data && !data.pluginsEnabled ? (
-        <div className={styles.warningBox}>{t('plugin_store.global_disabled_hint')}</div>
+        <Notice tone="warning">{t('plugin_store.global_disabled_hint')}</Notice>
       ) : null}
 
       {restartNames.length > 0 ? (
-        <div className={styles.warningBox}>
+        <Notice tone="warning">
           {t('plugin_store.restart_required_banner', { plugins: restartNames.join(', ') })}
-        </div>
+        </Notice>
       ) : null}
 
-      {/* ── Status Bar ── */}
-      {data ? (
-        <div className={styles.statusBar}>
-          <div className={styles.statusPill}>
-            <span
-              className={`${styles.statusDot} ${
-                data.pluginsEnabled ? styles.statusDotOn : styles.statusDotOff
-              }`}
-            />
-            <span className={styles.statusLabel}>{t('plugin_store.global_status')}</span>
-            <span className={styles.statusValue}>
-              {data.pluginsEnabled
-                ? t('plugin_store.global_enabled')
-                : t('plugin_store.global_disabled')}
-            </span>
-          </div>
-
-          <span className={styles.statusDivider} />
-
-          <div className={styles.statusPill}>
-            <span className={styles.statusLabel}>{t('plugin_store.plugins_dir')}</span>
-            <span
-              className={`${styles.statusValue} ${styles.statusPathValue}`}
-              title={data.pluginsDir || 'plugins'}
-            >
-              {data.pluginsDir || 'plugins'}
-            </span>
-          </div>
-
-          <span className={styles.statusDivider} />
-
-          <div className={styles.statusPill}>
-            <span className={styles.statusLabel}>{t('plugin_store.stat_available')}</span>
-            <span className={styles.statusValue}>{stats.total}</span>
-          </div>
-        </div>
-      ) : null}
-
-      {/* ── Toolbar ── */}
       <div className={styles.toolbar}>
+        <div className={styles.filters} role="group" aria-label={t('plugin_store.filter_label')}>
+          {statusFilters.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              className={`${styles.filter} ${statusFilter === item.key ? styles.filterActive : ''}`}
+              onClick={() => setStatusFilter(item.key)}
+              aria-pressed={statusFilter === item.key}
+            >
+              {item.label}
+              <span className={styles.filterCount}>{item.count}</span>
+            </button>
+          ))}
+        </div>
         <Input
           type="search"
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
           placeholder={t('plugin_store.search_placeholder')}
           aria-label={t('plugin_store.search_label')}
-          rightElement={<IconSearch size={16} />}
+          rightElement={<IconSearch size={14} />}
         />
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={loadStore}
-          disabled={!connected || loading}
-          loading={loading}
-        >
-          <IconRefreshCw size={16} />
-          {t('plugin_store.refresh')}
-        </Button>
       </div>
 
-      {/* ── Status Filter Chips ── */}
-      <div className={styles.filterChips} role="group" aria-label={t('plugin_store.filter_label')}>
-        {statusFilters.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            className={`${styles.filterChip} ${
-              statusFilter === item.key ? styles.filterChipActive : ''
-            }`}
-            onClick={() => setStatusFilter(item.key)}
-            aria-pressed={statusFilter === item.key}
-          >
-            {item.label}
-            <span className={styles.filterChipCount}>{item.count}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* ── Plugin Cards ── */}
       {loading ? (
-        <div className={styles.cardGrid}>
-          {Array.from({ length: 6 }, (_, index) => (
+        <div className={styles.cardGrid} aria-hidden="true">
+          {Array.from({ length: 4 }, (_, index) => (
             <div key={index} className={styles.skeletonCard}>
-              <div className={styles.skeletonHeader}>
-                <div className={styles.skeletonAvatar} />
-                <div className={styles.skeletonText}>
-                  <div className={styles.skeletonLine} />
-                  <div className={styles.skeletonLine} />
-                </div>
-              </div>
-              <div className={styles.skeletonBody} />
+              <div className={styles.skeletonAvatar} />
+              <div className={styles.skeletonLine} />
             </div>
           ))}
         </div>
@@ -1140,12 +1075,6 @@ export function PluginStorePage() {
             <EmptyState
               title={t('plugin_store.no_plugins')}
               description={t('plugin_store.no_plugins_desc')}
-              action={
-                <Button variant="secondary" size="sm" onClick={loadStore} disabled={!connected}>
-                  <IconRefreshCw size={16} />
-                  {t('plugin_store.refresh')}
-                </Button>
-              }
             />
           ) : (
             <EmptyState

@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { CONFIG_TAB_ICONS } from '../../constants';
 import type { ConfigSectionProps } from '../../types';
 import { getValidationMessage } from '../blocks/shared';
 import { SectionCard } from '../SectionCard';
@@ -12,8 +11,6 @@ import {
   PortField,
   ProxyUrlField,
 } from '../fields/sharedFields';
-
-const Icon = CONFIG_TAB_ICONS.common;
 
 /**
  * 「常用」tab：原简单模式的 6 个高频字段，别名视图（不占分区序号）。
@@ -32,7 +29,6 @@ export function SectionCommon({
 
   return (
     <SectionCard
-      icon={<Icon size={16} />}
       title={t('config_management.visual.sections.common.title')}
       description={t('config_management.visual.sections.common.description')}
       animateIn={animateIn}

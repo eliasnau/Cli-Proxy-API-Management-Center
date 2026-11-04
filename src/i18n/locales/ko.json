@@ -100,6 +100,7 @@
     "status": "연결 상태:"
   },
   "nav": {
+    "accounts": "Accounts",
     "dashboard": "대시보드",
     "quick_start": "빠른 시작",
     "ai_providers": "AI 공급자",
@@ -115,6 +116,8 @@
     "devices": "사용량"
   },
   "nav_groups": {
+    "primary": "Navigation",
+    "more": "More",
     "operate": "운영",
     "gateway": "게이트웨이",
     "observe": "모니터링",
@@ -122,6 +125,7 @@
     "control": "제어"
   },
   "nav_meta": {
+    "accounts": "Providers, auth files & OAuth",
     "dashboard": "운영 개요",
     "quick_start": "APIKEY.FUN 설정",
     "ai_providers": "업스트림 모델 라우팅",
@@ -137,6 +141,20 @@
     "devices": "키 및 지출 한도"
   },
   "dashboard": {
+    "routing_title": "Routing",
+    "routing_open": "Open routing",
+    "routing_saved": "Routing settings saved",
+    "routing_save_failed": "Could not save routing settings",
+    "routing_load_failed": "Could not load routing settings",
+    "devices_title": "Devices",
+    "devices_open": "Open usage",
+    "devices_empty": "No device keys yet. Add one on the Usage page.",
+    "devices_load_failed": "Could not load devices",
+    "devices_all_access": "All accounts",
+    "devices_disabled": "Disabled",
+    "devices_spend": "{{spent}} of {{limit}}",
+    "devices_spend_unlimited": "{{spent}} · no limit",
+    "devices_spend_aria": "Monthly spend of {{name}}",
     "hero_verdict_good": "모든 시스템 정상",
     "hero_verdict_warning": "다소 불안정",
     "hero_verdict_critical": "주의 필요",
@@ -222,6 +240,18 @@
     "routing_strategy_round_robin": "round-robin (순환)",
     "routing_strategy_weighted_round_robin": "weighted-round-robin (가중 순환)",
     "routing_strategy_fill_first": "fill-first (우선 채우기)"
+  },
+  "accounts": {
+    "title": "계정",
+    "subtitle": "연결된 제공자 계정, OAuth 자격 증명 및 API 키",
+    "add": "계정 추가",
+    "tab_auth_files": "인증 파일",
+    "tab_providers": "API 제공자",
+    "tab_add": "계정 추가",
+    "add_oauth_title": "OAuth로 로그인",
+    "add_file_hint": "이미 자격 증명 JSON 파일이 있나요? 대신 업로드하세요.",
+    "add_provider_hint": "API 키를 사용하나요? API 제공자로 추가하세요.",
+    "add_provider_action": "API 제공자 추가"
   },
   "auth_files": {
     "title": "인증 파일 관리",
@@ -2427,6 +2457,27 @@
     "expired": "바인딩 세션이 만료되었습니다. 다시 시작하세요."
   },
   "devices": {
+    "access_title": "Access",
+    "access_hint": "Choose which subscriptions may serve this device. Requests are only routed; nothing sent upstream changes.",
+    "access_providers": "Providers",
+    "access_all_providers": "All",
+    "access_accounts": "Specific accounts",
+    "access_any_account": "Any account",
+    "access_selected": "{{count}} selected",
+    "access_loading": "Loading accounts...",
+    "access_load_failed": "Could not load accounts",
+    "access_no_accounts": "No accounts available",
+    "access_account_off": "disabled",
+    "access_models": "Allowed models",
+    "access_models_hint": "Optional. Comma separated, * wildcards allowed. Empty allows every model.",
+    "access_badge_only": "{{provider}} only",
+    "access_badge_accounts_one": "{{count}} account",
+    "access_badge_accounts_other": "{{count}} accounts",
+    "access_badge_models_one": "{{count}} model rule",
+    "access_badge_models_other": "{{count}} model rules",
+    "access_detail_providers": "Providers: {{list}}",
+    "access_detail_accounts": "Accounts: {{list}}",
+    "access_detail_models": "Models: {{list}}",
     "title": "사용량",
     "description": "Give each device its own API key and cap how much it can spend per month. Upstream requests are unchanged.",
     "add": "Add device",

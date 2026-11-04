@@ -1,5 +1,4 @@
 @use '../../../styles/mixins' as *;
-@use '../../../styles/variables' as *;
 
 .providerTable {
   min-width: 960px;
@@ -28,7 +27,7 @@
 
 .primarySub {
   font-size: 12px;
-  color: var(--muted-foreground);
+  color: var(--text-tertiary);
   font-family: $font-mono;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -52,11 +51,10 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  padding: 3px 9px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: var(--muted-bg);
-  color: var(--muted-foreground);
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
@@ -71,10 +69,6 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 9px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: var(--muted-bg);
   font-size: 12px;
   line-height: 1.4;
   white-space: nowrap;
@@ -93,11 +87,10 @@
 .flagTag {
   display: inline-flex;
   align-items: center;
-  padding: 3px 9px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--primary-30);
-  background: var(--primary-10);
-  color: var(--primary-color);
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
@@ -108,8 +101,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 9px;
-  border-radius: var(--radius-md);
+  padding: 1px 6px;
+  border-radius: 4px;
   border: 1px solid;
   font-size: 12px;
   font-weight: 500;
@@ -136,8 +129,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 7px;
-  border-radius: 999px;
+  padding: 1px 6px;
+  border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
@@ -181,7 +174,7 @@
   right: 0;
   width: 176px;
   min-width: 176px;
-  box-shadow: -12px 0 16px -18px rgba(15, 23, 42, 0.45);
+  box-shadow: -1px 0 0 var(--border-color);
 }
 
 .actionsHead {
@@ -216,8 +209,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: 1px solid transparent;
   border-radius: var(--radius-md);

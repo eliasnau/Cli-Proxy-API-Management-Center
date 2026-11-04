@@ -68,6 +68,28 @@ export interface Device {
   lastUsedAt: string | null;
   month: string;
   usage: DeviceMonthUsage;
+  /** Provider keys this device may use ("claude", "codex", ...); empty = all. */
+  allowedProviders: string[];
+  /** Specific auth IDs this device may use; empty = any of the allowed providers. */
+  allowedAuths: string[];
+  /** Model glob patterns this device may use; empty = all. */
+  allowedModels: string[];
+}
+
+/** A credential a device can be restricted to (GET /devices/accounts). */
+export interface DeviceAccount {
+  id: string;
+  provider: string;
+  label: string;
+  email: string;
+  name: string;
+  disabled: boolean;
+}
+
+export interface DeviceAccess {
+  allowedProviders: string[];
+  allowedAuths: string[];
+  allowedModels: string[];
 }
 
 export interface DevicePriceRule {
@@ -84,7 +106,7 @@ export interface DevicePricing {
   defaults: DevicePriceRule[];
 }
 
-export interface DeviceUpdate {
+export interface DeviceUpdate extends Partial<DeviceAccess> {
   name?: string;
   monthlyLimitUsd?: number;
   disabled?: boolean;
@@ -97,6 +119,14 @@ const num = (value: unknown): number => {
 };
 
 const str = (value: unknown): string => (typeof value === 'string' ? value : '');
+
+const strList = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value
+        .map(str)
+        .map((v) => v.trim())
+        .filter(Boolean)
+    : [];
 
 const normalizeDay = (day: string, cost: unknown, detail: unknown): DeviceDayUsage => {
   const d = isRecord(detail) ? detail : null;
@@ -165,6 +195,23 @@ export const normalizeDevice = (value: unknown): Device | null => {
       : str(value.last_used_at) || null,
     month: str(value.month),
     usage: normalizeMonthUsage(value.usage),
+    allowedProviders: strList(value.allowed_providers),
+    allowedAuths: strList(value.allowed_auths),
+    allowedModels: strList(value.allowed_models),
+  };
+};
+
+const normalizeAccount = (value: unknown): DeviceAccount | null => {
+  if (!isRecord(value)) return null;
+  const id = str(value.id);
+  if (!id) return null;
+  return {
+    id,
+    provider: str(value.provider).toLowerCase(),
+    label: str(value.label),
+    email: str(value.email),
+    name: str(value.name),
+    disabled: value.disabled === true,
   };
 };
 
@@ -230,11 +277,16 @@ export const devicesApi = {
     return list.map(normalizeDevice).filter(Boolean) as Device[];
   },
 
-  async create(input: { name: string; monthlyLimitUsd: number; note?: string }) {
+  async create(
+    input: { name: string; monthlyLimitUsd: number; note?: string } & Partial<DeviceAccess>
+  ) {
     const data = await apiClient.post<unknown>('/devices', {
       name: input.name,
       monthly_limit_usd: input.monthlyLimitUsd,
       note: input.note ?? '',
+      allowed_providers: input.allowedProviders ?? [],
+      allowed_auths: input.allowedAuths ?? [],
+      allowed_models: input.allowedModels ?? [],
     });
     return deviceFromResponse(data);
   },
@@ -245,6 +297,10 @@ export const devicesApi = {
     if (patch.monthlyLimitUsd !== undefined) body.monthly_limit_usd = patch.monthlyLimitUsd;
     if (patch.disabled !== undefined) body.disabled = patch.disabled;
     if (patch.note !== undefined) body.note = patch.note;
+    // Empty arrays clear a restriction; omitted fields stay unchanged.
+    if (patch.allowedProviders !== undefined) body.allowed_providers = patch.allowedProviders;
+    if (patch.allowedAuths !== undefined) body.allowed_auths = patch.allowedAuths;
+    if (patch.allowedModels !== undefined) body.allowed_models = patch.allowedModels;
     const data = await apiClient.patch<unknown>(`/devices/${encodeURIComponent(id)}`, body);
     return deviceFromResponse(data);
   },
@@ -262,6 +318,20 @@ export const devicesApi = {
     return Object.entries(months)
       .map(([month, usage]) => ({ month, usage: normalizeMonthUsage(usage) }))
       .sort((a, b) => b.month.localeCompare(a.month));
+  },
+
+  /** Credentials a device can be restricted to, plus the providers that have any. */
+  async accounts(): Promise<{ accounts: DeviceAccount[]; providers: string[] }> {
+    const data = await apiClient.get<unknown>('/devices/accounts');
+    const raw = isRecord(data) ? data : {};
+    const accounts = Array.isArray(raw.accounts)
+      ? (raw.accounts.map(normalizeAccount).filter(Boolean) as DeviceAccount[])
+      : [];
+    const providers = strList(raw.providers).map((p) => p.toLowerCase());
+    return {
+      accounts,
+      providers: providers.length > 0 ? providers : [...new Set(accounts.map((a) => a.provider))],
+    };
   },
 
   remove: (id: string) => apiClient.delete(`/devices/${encodeURIComponent(id)}`),

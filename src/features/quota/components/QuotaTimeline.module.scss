@@ -21,15 +21,15 @@ $lane-width: 210px;
 
 .title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 650;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
 .range {
   margin: 2px 0 0;
-  font-size: 12px;
-  color: var(--text-quaternary);
+  font-size: 12.5px;
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -45,19 +45,21 @@ $lane-width: 210px;
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  padding: 3px;
+  padding: 2px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
-  border-radius: 999px;
+  border-radius: $radius-md;
 
   button {
-    padding: 4px 12px;
+    height: 26px;
+    padding: 0 10px;
     font: inherit;
-    font-size: 12.5px;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--text-secondary);
     background: transparent;
-    border: 1px solid transparent;
-    border-radius: 999px;
+    border: 0;
+    border-radius: 6px;
     cursor: pointer;
     transition: all $transition-fast;
 
@@ -71,16 +73,21 @@ $lane-width: 210px;
     }
 
     &[aria-pressed='true'] {
-      background: var(--floating-surface, var(--bg-primary));
-      border-color: var(--border-hover);
+      background: var(--bg-primary);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
       color: var(--text-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 1px;
     }
   }
 }
 
 .chart {
   border: 1px solid var(--border-color);
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   background: var(--bg-primary);
   overflow: hidden;
 }
@@ -90,8 +97,8 @@ $lane-width: 210px;
   display: grid;
   place-items: center;
   padding: $spacing-lg;
-  color: var(--text-quaternary);
-  font-size: 12px;
+  color: var(--text-tertiary);
+  font-size: 13px;
   text-align: center;
 }
 
@@ -107,11 +114,9 @@ $lane-width: 210px;
 
 .axisLabel {
   padding: 8px 12px;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-quaternary);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
   display: flex;
   align-items: flex-end;
 }
@@ -131,12 +136,12 @@ $lane-width: 210px;
   border-left: 1px solid var(--border-color);
 
   &[data-weekend='1'] {
-    background: rgba(255, 255, 255, 0.014);
+    background: color-mix(in srgb, var(--bg-tertiary) 40%, transparent);
   }
 
   // The current day is the reference point for reading the whole chart.
   &[data-today='1'] {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--bg-tertiary);
   }
 }
 
@@ -158,7 +163,7 @@ $lane-width: 210px;
   border-top: 1px solid var(--border-color);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.012);
+    background: color-mix(in srgb, var(--bg-tertiary) 30%, transparent);
   }
 }
 
@@ -166,7 +171,7 @@ $lane-width: 210px;
   display: flex;
   flex-direction: column;
   gap: 3px;
-  padding: 9px 12px;
+  padding: 8px 12px;
   min-width: 0;
 }
 
@@ -186,7 +191,7 @@ $lane-width: 210px;
 }
 
 .laneName {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
@@ -240,7 +245,7 @@ $lane-width: 210px;
     border-left: 1px solid var(--border-color);
 
     &[data-weekend='1'] {
-      background: rgba(255, 255, 255, 0.014);
+      background: color-mix(in srgb, var(--bg-tertiary) 40%, transparent);
     }
   }
 }
@@ -341,8 +346,8 @@ $lane-width: 210px;
   align-items: center;
   flex-wrap: wrap;
   gap: $spacing-md;
-  font-size: 11px;
-  color: var(--text-quaternary);
+  font-size: 12px;
+  color: var(--text-tertiary);
 }
 
 .legendItem {

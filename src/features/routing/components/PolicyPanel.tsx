@@ -15,30 +15,6 @@ export interface PolicyPanelProps {
   onChange: (next: RoutingSettings) => void;
 }
 
-function StrategyMark({ strategy }: { strategy: RoutingStrategy }) {
-  // Three dots: even (round-robin), graded (weighted), first one filled (fill-first).
-  const opacities =
-    strategy === 'round-robin'
-      ? [1, 1, 1]
-      : strategy === 'weighted-round-robin'
-        ? [1, 0.6, 0.3]
-        : [1, 0.25, 0.25];
-  return (
-    <svg width="18" height="10" viewBox="0 0 18 10" aria-hidden="true" focusable="false">
-      {opacities.map((opacity, index) => (
-        <circle
-          key={index}
-          cx={3 + index * 6}
-          cy={5}
-          r={2.4}
-          fill="currentColor"
-          opacity={opacity}
-        />
-      ))}
-    </svg>
-  );
-}
-
 export function PolicyPanel({ settings, disabled = false, onChange }: PolicyPanelProps) {
   const { t } = useTranslation();
   const id = useId();
@@ -109,7 +85,6 @@ export function PolicyPanel({ settings, disabled = false, onChange }: PolicyPane
                 className={checked ? styles.strategyOptionActive : styles.strategyOption}
                 onClick={() => update({ strategy })}
               >
-                <StrategyMark strategy={strategy} />
                 {t(`routing.strategy_${strategyKey(strategy)}`)}
               </button>
             );

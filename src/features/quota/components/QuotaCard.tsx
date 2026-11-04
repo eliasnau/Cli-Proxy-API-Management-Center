@@ -5,6 +5,7 @@
 
 import { useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/Button';
 import { IconRefreshCw } from '@/components/ui/icons';
 import type { ClaudeQuotaState, ResolvedTheme } from '@/types';
 import { resolveQuotaErrorMessage } from '@/utils/quota';
@@ -144,7 +145,7 @@ export function QuotaCard(props: QuotaCardProps) {
             onClick={onRefresh}
             disabled={!canRefresh}
           >
-            <IconRefreshCw size={15} aria-hidden="true" className={styles.idleGlyph} />
+            <IconRefreshCw size={13} aria-hidden="true" className={styles.idleGlyph} />
             <span className={styles.idleHint}>{t(`${adapter.i18nPrefix}.idle`)}</span>
           </button>
         ) : loading && !retainedClaudeUsage ? (
@@ -189,39 +190,54 @@ export function QuotaCard(props: QuotaCardProps) {
       {status !== 'idle' && (
         <footer className={styles.actionRow}>
           {entry.type === 'claude' && (
-            <button
-              type="button"
-              className={styles.actionPill}
+            <Button
+              variant="ghost"
+              size="sm"
+              className={styles.action}
               disabled={claudeReset.blocked}
               onClick={claudeReset.confirm}
               title={t(`claude_reset.${claudeReset.buttonLabel}`)}
             >
-              <IconRefreshCw size={13} className={claudeReset.busy ? styles.spinning : undefined} />
+              <IconRefreshCw
+                size={13}
+                className={claudeReset.busy ? styles.spinning : undefined}
+                aria-hidden="true"
+              />
               {t(`claude_reset.${claudeReset.buttonLabel}`)}
-            </button>
+            </Button>
           )}
           {showReset && (
-            <button
-              type="button"
-              className={styles.actionPill}
+            <Button
+              variant="ghost"
+              size="sm"
+              className={styles.action}
               onClick={onReset}
               disabled={!canRefresh || loading || resetting}
               title={t('codex_quota.reset_button')}
             >
-              <IconRefreshCw size={13} className={resetting ? styles.spinning : undefined} />
+              <IconRefreshCw
+                size={13}
+                className={resetting ? styles.spinning : undefined}
+                aria-hidden="true"
+              />
               {t('codex_quota.reset_button')}
-            </button>
+            </Button>
           )}
-          <button
-            type="button"
-            className={styles.actionPill}
+          <Button
+            variant="ghost"
+            size="sm"
+            className={styles.action}
             onClick={onRefresh}
             disabled={isQuotaRefreshDisabled(canRefresh, loading, resetting || claudeReset.busy)}
             title={t('auth_files.quota_refresh_hint')}
           >
-            <IconRefreshCw size={13} className={loading ? styles.spinning : undefined} />
+            <IconRefreshCw
+              size={13}
+              className={loading ? styles.spinning : undefined}
+              aria-hidden="true"
+            />
             {t('auth_files.quota_refresh_single')}
-          </button>
+          </Button>
         </footer>
       )}
     </article>

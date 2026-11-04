@@ -1,10 +1,12 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores';
 import { useHeaderRefresh } from '@/hooks/useHeaderRefresh';
 import { formatCompactNumber, formatPercent } from '@/utils/format';
 import { useDashboardOverview } from './hooks/useDashboardOverview';
 import { ThroughputChart } from './components/ThroughputChart';
+import { DevicesCard } from './components/DevicesCard';
+import { RoutingCard } from './components/RoutingCard';
 import { providerLabel, splitWindowMinutes } from './utils';
 import styles from './dashboard.module.scss';
 
@@ -21,7 +23,13 @@ export function DashboardPage() {
   const { connectionStatus, connected, counts, traffic, providers, credentials, refresh } =
     useDashboardOverview();
 
-  useHeaderRefresh(refresh, connected);
+  // The header refresh reloads the overview and both cards.
+  const [reloadToken, setReloadToken] = useState(0);
+  const refreshAll = useCallback(async () => {
+    setReloadToken((n) => n + 1);
+    await refresh();
+  }, [refresh]);
+  useHeaderRefresh(refreshAll, connected);
 
   const windowLabel = useMemo(() => {
     if (traffic.windowMinutes <= 0) return DASH;
@@ -112,6 +120,11 @@ export function DashboardPage() {
           <ThroughputChart traffic={traffic} />
         </div>
       </section>
+
+      <div className={styles.split}>
+        <RoutingCard connected={connected} reloadToken={reloadToken} />
+        <DevicesCard connected={connected} reloadToken={reloadToken} />
+      </div>
 
       <section className={styles.card} aria-labelledby="dashboard-providers-title">
         <header className={styles.cardHead}>

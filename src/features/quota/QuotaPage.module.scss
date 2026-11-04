@@ -1,39 +1,20 @@
 @use '../../styles/mixins' as *;
 
-/* ============================================================
- * 额度页壳层：纯布局，视觉细节都在各组件的 colocated 模块里。
- * ============================================================ */
+/* Quota page shell: layout only; card/body visuals live in the colocated modules. */
 
 .page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   width: 100%;
   min-width: 0;
 }
 
-/* ---------- 工作区（tabs + 网格 + 分页） ---------- */
-
 .workbench {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  min-width: 0;
-}
-
-/* 提供商导航独占一行，保留原生横向滚动。 */
-
-.tabsRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 12px;
   min-width: 0;
-
-  > :first-child {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
 }
 
 .toolbar {
@@ -41,7 +22,7 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px 16px;
+  gap: 8px 12px;
   min-width: 0;
 }
 
@@ -49,24 +30,23 @@
   position: relative;
   display: flex;
   align-items: center;
-  flex: 0 1 340px;
+  flex: 0 1 300px;
   min-width: 0;
-  height: 36px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
+  height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-md;
+  background: var(--bg-primary);
+  color: var(--text-tertiary);
+  transition: border-color var(--dur-hover, 160ms) var(--ease-out-strong, ease-out);
 
   &:focus-within {
-    border-color: var(--border-hover);
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
+    border-color: var(--primary-color);
   }
 }
 
 .searchIcon {
   position: absolute;
-  left: 11px;
+  left: 10px;
   pointer-events: none;
 }
 
@@ -74,7 +54,7 @@
   width: 100%;
   min-width: 0;
   height: 100%;
-  padding: 0 42px 0 35px;
+  padding: 0 32px 0 30px;
   border: 0;
   border-radius: inherit;
   outline: none;
@@ -96,26 +76,27 @@
 
 .clearSearch {
   position: absolute;
-  right: 2px;
+  right: 3px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: 6px;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   cursor: pointer;
+
+  &:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
 
   &:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: -2px;
-  }
-
-  &:active {
-    transform: scale(0.97);
   }
 }
 
@@ -123,98 +104,56 @@
   flex: 0 0 auto;
   min-width: 148px;
   max-width: 100%;
-
-  button[aria-haspopup='listbox'] {
-    height: 36px;
-    border-color: transparent;
-    border-radius: 10px;
-    background: transparent;
-    box-shadow: none;
-    color: var(--text-secondary);
-
-    &:focus-visible,
-    &[aria-expanded='true'] {
-      outline: 2px solid var(--primary-color);
-      outline-offset: 2px;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-    }
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .clearSearch:hover,
-  .sort button[aria-haspopup='listbox']:hover {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .clearSearch:active {
-    transform: none;
-  }
 }
 
 @include mobile {
   .search {
-    flex: 1 1 220px;
-    height: 40px;
-  }
-
-  .clearSearch {
-    width: 36px;
-    height: 36px;
-  }
-
-  .sort button[aria-haspopup='listbox'] {
-    height: 40px;
+    flex: 1 1 200px;
   }
 }
 
-.errorBanner {
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--danger-color);
-  background: var(--bg-error-light);
-  border: 1px solid var(--warning-border);
-  border-radius: 10px;
-  padding: 9px 12px;
-  overflow-wrap: anywhere;
-}
-
-/* ---------- 卡片网格 ----------
- * 列宽由 CSS 决定（不再用 JS 测量）：额度卡承载水位条，取 340px 下限，
- * 与认证文件页配额模式（.gridQuota）同一档。 */
-
+/* Cards: CSS-driven columns; quota rows need ~300px to stay readable. */
 .grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   align-items: stretch;
 }
-
-/* ---------- 分页 ---------- */
 
 .pagination {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .pageInfo {
-  font-family: $font-mono;
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
-@include mobile {
-  .page {
-    gap: 16px;
+// Button wraps children in a span; keep icon + label aligned.
+.headerButton > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spinning {
+  animation: quota-spin 0.8s linear infinite;
+}
+
+@keyframes quota-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinning {
+    animation: none;
   }
 }

@@ -22,39 +22,10 @@
   }
 }
 
-.intro {
-  display: flex;
-  align-items: flex-start;
-  gap: $spacing-md;
-  padding: $spacing-xs 0;
-}
-
-.introIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--border-color);
-  border-radius: $radius-lg;
-  background: var(--bg-primary);
-  color: var(--text-secondary);
-}
-
-.introTitle {
-  margin: 0 0 6px;
-  font-size: 22px;
-  font-weight: 650;
-  letter-spacing: -0.5px;
-  line-height: 1.3;
-  color: var(--text-primary);
-}
-
 .description {
   margin: 0;
   font-size: 13px;
-  line-height: 1.65;
+  line-height: 1.5;
   color: var(--text-secondary);
   overflow-wrap: anywhere;
 }
@@ -63,12 +34,13 @@
   min-width: 0;
   padding: 0;
   overflow: visible;
+  border-radius: 8px;
   box-shadow: none;
 }
 
 .providerSection,
 .editorBody {
-  padding: $spacing-lg;
+  padding: 16px;
 
   @include mobile {
     padding: $spacing-md;
@@ -78,7 +50,7 @@
 .providerSection {
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
+  gap: 12px;
 }
 
 .providerRow {
@@ -101,31 +73,16 @@
   min-width: 0;
 }
 
-.stepNumber {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--border-color);
-  border-radius: $radius-sm;
-  color: var(--text-tertiary);
-  font-family: $font-mono;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
-
 .headingCopy {
   min-width: 0;
 }
 
 .sectionTitle {
   display: block;
-  margin: 2px 0 4px;
-  font-size: 15px;
-  font-weight: 650;
-  line-height: 1.5;
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
   color: var(--text-primary);
 }
 
@@ -149,12 +106,12 @@
   display: inline-flex;
   align-items: center;
   gap: $spacing-sm;
-  min-height: 38px;
+  min-height: 30px;
   max-width: 100%;
-  padding: 7px 10px;
+  padding: 4px 10px;
   border: 1px solid var(--border-color);
-  border-radius: $radius-md;
-  background: var(--bg-secondary);
+  border-radius: 6px;
+  background: var(--bg-primary);
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 500;
@@ -165,8 +122,8 @@
     color 160ms ease;
 
   img {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     object-fit: contain;
   }
 
@@ -192,7 +149,7 @@
 
   @media (hover: hover) and (pointer: fine) {
     &:hover:not(:disabled) {
-      border-color: var(--primary-color);
+      border-color: var(--border-hover);
       background: var(--bg-tertiary);
       color: var(--text-primary);
     }
@@ -205,7 +162,6 @@
 
 .providerOptionActive {
   border-color: var(--primary-color);
-  background: var(--primary-10);
   color: var(--text-primary);
 
   .providerCheck {
@@ -218,8 +174,8 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: $spacing-md;
-  padding: $spacing-lg;
+  gap: 12px;
+  padding: 16px;
   border-bottom: 1px solid var(--border-color);
 
   @include mobile {
@@ -229,8 +185,8 @@
 
 .countBadge {
   flex-shrink: 0;
-  padding: 4px 9px;
-  border-radius: $radius-full;
+  padding: 2px 8px;
+  border-radius: 4px;
   background: var(--bg-tertiary);
   color: var(--text-secondary);
   font-size: 12px;
@@ -244,9 +200,7 @@
   flex-direction: column;
   gap: $spacing-sm;
   margin: 0;
-  padding: $spacing-2xl $spacing-md;
-  border: 1px dashed var(--border-color);
-  border-radius: $radius-md;
+  padding: 20px 12px;
   color: var(--text-tertiary);
   text-align: center;
   font-size: 13px;
@@ -256,9 +210,8 @@
   display: flex;
   align-items: flex-start;
   gap: $spacing-sm;
-  padding: $spacing-md $spacing-lg;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--border-color);
-  background: var(--bg-secondary);
 
   svg {
     margin-top: 3px;
@@ -274,19 +227,19 @@
 .mappingsBody {
   display: flex;
   flex-direction: column;
-  gap: $spacing-sm;
-  padding: $spacing-md;
+  padding: 4px 16px;
 }
 
 .mappingRow {
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr) auto;
   align-items: center;
-  gap: $spacing-md;
-  padding: $spacing-md;
-  border: 1px solid var(--border-color);
-  border-radius: $radius-md;
-  background: var(--bg-secondary);
+  gap: 12px;
+  padding: 12px 0;
+
+  & + & {
+    border-top: 1px solid var(--border-color);
+  }
 
   @include mobile {
     grid-template-columns: 20px minmax(0, 1fr);
@@ -296,8 +249,7 @@
 
 .mappingNumber {
   color: var(--text-tertiary);
-  font-family: $font-mono;
-  font-size: 11px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -340,7 +292,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 38px;
+  height: 34px;
   color: var(--text-tertiary);
 
   @media (max-width: 540px) {
@@ -353,7 +305,7 @@
   align-items: center;
   gap: $spacing-sm;
   align-self: end;
-  min-height: 38px;
+  min-height: 34px;
 
   @include mobile {
     grid-column: 2;
@@ -365,8 +317,8 @@
 
 .removeMapping {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   color: var(--text-tertiary);
 

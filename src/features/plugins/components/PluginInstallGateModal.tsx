@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Notice } from '@/components/page';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
-import { IconAlertTriangle, IconExternalLink, IconPlug } from '@/components/ui/icons';
+import { IconExternalLink, IconPlug } from '@/components/ui/icons';
 import { useAuthStore } from '@/stores';
 import type { PluginStoreEntry } from '@/types';
 import {
@@ -29,7 +30,7 @@ function GateLogo({ src }: { src: string }) {
   return src && !failed ? (
     <img src={src} alt="" onError={() => setFailed(true)} />
   ) : (
-    <IconPlug size={26} />
+    <IconPlug size={18} />
   );
 }
 
@@ -89,25 +90,27 @@ export function PluginInstallGateModal({
       <div className={styles.logoBox} aria-hidden="true">
         <GateLogo src={logo} />
       </div>
-      <h3 className={styles.name}>{title}</h3>
-      {repositoryURL ? (
-        <a
-          className={styles.repoLink}
-          href={repositoryURL}
-          target="_blank"
-          rel="noreferrer"
-          title={t('plugin_store.open_repository')}
-          aria-label={t('plugin_store.open_repository')}
-        >
-          <span>{repoLabel}</span>
-          <IconExternalLink size={12} />
-        </a>
-      ) : (
-        <p className={styles.slug}>{repoLabel}</p>
-      )}
-      {sourceText ? (
-        <p className={styles.source}>{t('plugin_store.source_name', { source: sourceText })}</p>
-      ) : null}
+      <div className={styles.identityText}>
+        <h3 className={styles.name}>{title}</h3>
+        {repositoryURL ? (
+          <a
+            className={styles.repoLink}
+            href={repositoryURL}
+            target="_blank"
+            rel="noreferrer"
+            title={t('plugin_store.open_repository')}
+            aria-label={t('plugin_store.open_repository')}
+          >
+            <span>{repoLabel}</span>
+            <IconExternalLink size={12} />
+          </a>
+        ) : (
+          <p className={styles.slug}>{repoLabel}</p>
+        )}
+        {sourceText ? (
+          <p className={styles.source}>{t('plugin_store.source_name', { source: sourceText })}</p>
+        ) : null}
+      </div>
     </div>
   );
 
@@ -125,16 +128,15 @@ export function PluginInstallGateModal({
     body = (
       <>
         {identity}
-        <div className={styles.warningBanner}>
-          <IconAlertTriangle size={18} />
-          <span>{t('plugin_store.gate_warning')}</span>
-        </div>
+        <Notice tone="warning" className={styles.spaced}>
+          <strong className={styles.noticeTitle}>{t('plugin_store.gate_warning')}</strong>
+        </Notice>
         <ul className={styles.effects}>
           <li>{t('plugin_store.gate_effect_runs_code')}</li>
           <li>{t('plugin_store.gate_effect_no_review')}</li>
           <li>{t('plugin_store.gate_effect_restart')}</li>
         </ul>
-        <div className={styles.untrustedAlert}>
+        <Notice tone="error" className={styles.spaced}>
           <p className={styles.untrustedText}>{t('plugin_store.gate_untrusted_alert')}</p>
           <dl className={styles.originGrid}>
             <dt>{t('plugin_store.gate_repository_label')}</dt>
@@ -142,7 +144,7 @@ export function PluginInstallGateModal({
             <dt>{t('plugin_store.gate_source_label')}</dt>
             <dd>{sourceText || '—'}</dd>
           </dl>
-        </div>
+        </Notice>
       </>
     );
     footer = (
