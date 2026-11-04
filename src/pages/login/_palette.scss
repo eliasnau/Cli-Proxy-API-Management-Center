@@ -9,29 +9,29 @@
 @mixin login-tokens-light {
   color-scheme: light;
 
-  --login-bg: #faf9f5;
-  --login-dot-color: #1c1917;
-  --login-title: #1c1917;
+  --login-bg: #fafafa;
+  --login-dot-color: #18181b;
+  --login-title: #18181b;
 
-  --login-text: #1c1917;
-  --login-text-muted: #57534e;
-  --login-text-faint: #8a847e;
+  --login-text: #18181b;
+  --login-text-muted: #52525b;
+  --login-text-faint: #8a8a93;
 
   --login-field-bg: rgba(28, 25, 23, 0.025);
   --login-field-bg-focus: #ffffff;
   --login-readout-bg: rgba(28, 25, 23, 0.045);
   --login-border: rgba(28, 25, 23, 0.12);
   --login-border-hover: rgba(28, 25, 23, 0.24);
-  --login-focus-border: rgba(28, 25, 23, 0.55);
-  --login-focus-ring: rgba(28, 25, 23, 0.07);
+  --login-focus-border: #d97757;
+  --login-focus-ring: rgba(217, 119, 87, 0.18);
   --login-hover-bg: rgba(28, 25, 23, 0.06);
   --login-outline: rgba(28, 25, 23, 0.5);
 
-  --login-submit-bg: #1c1917;
+  --login-submit-bg: #18181b;
   --login-submit-hover: #000000;
-  --login-submit-fg: #fafaf9;
+  --login-submit-fg: #fafafa;
 
-  --login-error: #b3402f;
+  --login-error: #b91c1c;
 
   --login-dropdown-bg: #ffffff;
   --login-dropdown-hover: rgba(28, 25, 23, 0.05);
@@ -40,7 +40,7 @@
   --login-dropdown-shadow: 0 16px 36px rgba(28, 25, 23, 0.12);
 
   --login-loader-track: rgba(28, 25, 23, 0.1);
-  --login-loader-bar: #1c1917;
+  --login-loader-bar: #d97757;
 
   // 共享组件 token
   --bg-secondary: var(--login-bg);
@@ -50,9 +50,9 @@
   --text-tertiary: var(--login-text-faint);
   --border-color: var(--login-border);
   --border-hover: var(--login-border-hover);
-  --primary-color: #1c1917;
-  --primary-hover: #000000;
-  --primary-active: #292524;
+  --primary-color: #d97757;
+  --primary-hover: #c86a4b;
+  --primary-active: #b55d40;
   --primary-contrast: #ffffff;
   --shadow: none;
   --shadow-lg: var(--login-dropdown-shadow);
@@ -61,7 +61,7 @@
 @mixin login-tokens-dark {
   color-scheme: dark;
 
-  --login-bg: #000000;
+  --login-bg: #0b0b0c;
   --login-dot-color: #e2e8f0;
   --login-title: #ffffff;
 
@@ -74,8 +74,8 @@
   --login-readout-bg: rgba(255, 255, 255, 0.045);
   --login-border: rgba(255, 255, 255, 0.1);
   --login-border-hover: rgba(255, 255, 255, 0.22);
-  --login-focus-border: rgba(255, 255, 255, 0.5);
-  --login-focus-ring: rgba(255, 255, 255, 0.06);
+  --login-focus-border: #e08463;
+  --login-focus-ring: rgba(224, 132, 99, 0.2);
   --login-hover-bg: rgba(255, 255, 255, 0.06);
   --login-outline: rgba(255, 255, 255, 0.55);
 
@@ -83,28 +83,28 @@
   --login-submit-hover: #ffffff;
   --login-submit-fg: #0a0a0a;
 
-  --login-error: #f2a59a;
+  --login-error: #fca5a5;
 
-  --login-dropdown-bg: #111111;
+  --login-dropdown-bg: #141416;
   --login-dropdown-hover: rgba(255, 255, 255, 0.07);
   --login-dropdown-active: rgba(255, 255, 255, 0.1);
   --login-dropdown-border: rgba(255, 255, 255, 0.1);
   --login-dropdown-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
 
   --login-loader-track: rgba(255, 255, 255, 0.1);
-  --login-loader-bar: #f5f5f4;
+  --login-loader-bar: #e08463;
 
   --bg-secondary: var(--login-bg);
-  --bg-primary: #0e0e0e;
+  --bg-primary: #141416;
   --text-primary: var(--login-text);
   --text-secondary: var(--login-text-muted);
   --text-tertiary: var(--login-text-faint);
   --border-color: var(--login-border);
   --border-hover: var(--login-border-hover);
-  --primary-color: #f5f5f4;
-  --primary-hover: #ffffff;
-  --primary-active: #e7e5e4;
-  --primary-contrast: #0a0a0a;
+  --primary-color: #e08463;
+  --primary-hover: #e99476;
+  --primary-active: #f0a486;
+  --primary-contrast: #ffffff;
   --shadow: none;
   --shadow-lg: var(--login-dropdown-shadow);
 }

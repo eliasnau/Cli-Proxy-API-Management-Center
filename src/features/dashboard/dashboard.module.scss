@@ -983,3 +983,178 @@
     box-shadow: 0 0 0 0 transparent;
   }
 }
+
+/* ---------- Simplified look ----------
+ * Calm overrides: no ambient wash/grid, no pulse wire, normal-size title,
+ * plain bordered cards, normal-case labels, accent-coloured primary action.
+ */
+.page {
+  gap: 32px;
+}
+
+.ambient,
+.heroWire {
+  display: none;
+}
+
+.hero {
+  padding-top: 0;
+  padding-bottom: 0;
+  align-items: stretch;
+}
+
+.heroCopy {
+  justify-content: center;
+  gap: 10px;
+}
+
+.heroTitle {
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.heroPeriodLive {
+  animation: none;
+}
+
+.heroMeta {
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.primaryAction,
+.ghostAction {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.primaryAction {
+  background: var(--primary-color);
+  color: var(--primary-contrast);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: none;
+      background: var(--primary-hover);
+      box-shadow: none;
+    }
+  }
+}
+
+.primaryAction:focus-visible,
+.ghostAction:focus-visible,
+.panelLink:focus-visible,
+.ctaCard:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 30%, transparent);
+}
+
+.heroPanel {
+  padding: 20px;
+  border-radius: 10px;
+  border-color: var(--border-color);
+  background: var(--bg-primary);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+.heroPanelLabel,
+.typeBreakdownLabel {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-secondary);
+}
+
+.liveBadge {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.heroFigure {
+  font-family: inherit;
+  font-size: 36px;
+  font-weight: 600;
+}
+
+.statsRow {
+  gap: 12px;
+}
+
+.statTile {
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: var(--bg-primary);
+
+  &::before {
+    display: none;
+  }
+}
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.statValue {
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.section {
+  gap: 12px;
+}
+
+.eyebrow {
+  display: none;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.sectionDescription {
+  font-size: 13.5px;
+}
+
+.panel {
+  padding: 20px;
+  border-radius: 10px;
+  background: var(--bg-primary);
+}
+
+.panelTitle {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.panelLink {
+  color: var(--primary-color);
+}
+
+.ctaCard {
+  border-radius: 10px;
+  background: var(--bg-primary);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--border-hover);
+    }
+  }
+}

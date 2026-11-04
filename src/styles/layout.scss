@@ -43,6 +43,7 @@
 }
 
 .top-gradient-blur {
+  display: none;
   position: fixed;
   top: 0;
   right: 0;
@@ -98,12 +99,10 @@
     height: 52px;
     padding: 0;
     border: 1px solid color-mix(in srgb, var(--border-color) 78%, transparent);
-    border-radius: 14px;
+    border-radius: 12px;
     background: var(--bg-primary);
-    color: color-mix(in srgb, var(--text-secondary) 88%, transparent);
-    box-shadow:
-      4px 0 14px rgb(0 0 0 / 0.18),
-      inset 0 1px 0 rgb(255 255 255 / 0.03);
+    color: var(--text-tertiary);
+    box-shadow: var(--shadow);
     cursor: pointer;
     pointer-events: auto;
     display: inline-flex;
@@ -136,8 +135,7 @@
     &:focus-visible {
       outline: none;
       box-shadow:
-        0 0 0 2px color-mix(in srgb, var(--primary-color) 24%, transparent),
-        4px 0 14px rgb(0 0 0 / 0.18);
+        0 0 0 2px color-mix(in srgb, var(--primary-color) 40%, transparent);
     }
   }
 
@@ -149,13 +147,11 @@
     align-items: center;
     gap: 4px;
     padding: 6px;
-    border: 1px solid color-mix(in srgb, var(--border-color) 68%, transparent);
-    border-radius: 16px;
-    background: color-mix(in srgb, var(--bg-primary) 68%, transparent);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-primary);
     color: var(--text-secondary);
-    box-shadow:
-      0 18px 44px rgb(0 0 0 / 0.17),
-      inset 0 1px 0 rgb(255 255 255 / 0.04);
+    box-shadow: var(--shadow);
     --glass-blur: 16px;
     backdrop-filter: var(--glass-backdrop-filter);
     -webkit-backdrop-filter: var(--glass-backdrop-filter);
@@ -220,8 +216,8 @@
     right: 0;
     z-index: $z-dropdown + 2;
     border: 1px solid color-mix(in srgb, var(--border-color) 74%, transparent);
-    background: color-mix(in srgb, var(--bg-primary) 88%, transparent);
-    box-shadow: 0 20px 48px rgb(0 0 0 / 0.22);
+    background: var(--floating-surface);
+    box-shadow: var(--floating-shadow);
     --glass-blur: 16px;
     backdrop-filter: var(--glass-backdrop-filter);
     -webkit-backdrop-filter: var(--glass-backdrop-filter);
@@ -405,7 +401,7 @@
   overflow-y: auto;
   background: var(--bg-primary);
   border: 0;
-  border-right: 1px solid color-mix(in srgb, var(--border-color) 78%, transparent);
+  border-right: 1px solid var(--border-color);
   border-radius: 0;
   box-shadow: none;
   scrollbar-width: none;
@@ -549,11 +545,9 @@
 
   .nav-group-label {
     padding: 0 10px 2px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--text-primary) 42%, transparent);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-tertiary);
     user-select: none;
   }
 
@@ -600,11 +594,11 @@
 
   .nav-item {
     padding: 6px 10px;
-    border-radius: 9px;
+    border-radius: $radius-md;
     border: 1px solid transparent;
-    color: var(--text-primary);
-    font-size: 13px;
-    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 500;
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -623,7 +617,7 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      color: color-mix(in srgb, var(--text-primary) 58%, transparent);
+      color: var(--text-tertiary);
       transition: color $transition-fast;
 
       svg {
@@ -685,24 +679,27 @@
     }
 
     &:hover {
-      background: color-mix(in srgb, var(--text-primary) 7%, transparent);
-      border-color: color-mix(in srgb, var(--border-color) 58%, transparent);
-      transform: translateX(1px);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
 
       .nav-icon {
-        color: color-mix(in srgb, var(--text-primary) 82%, transparent);
+        color: var(--text-secondary);
       }
     }
 
     &.active {
-      background: color-mix(in srgb, var(--text-primary) 10%, transparent);
-      color: var(--text-primary);
-      border-color: color-mix(in srgb, var(--border-hover) 70%, transparent);
-      box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+      background: color-mix(in srgb, var(--primary-color) 11%, transparent);
+      color: var(--primary-hover);
+      font-weight: 600;
 
       .nav-icon {
-        color: var(--primary-active);
+        color: var(--primary-color);
       }
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 40%, transparent);
     }
 
     &.nav-sub-item {
@@ -743,7 +740,7 @@
   padding: 9px 12px;
   overflow: hidden;
   border-radius: 10px;
-  background: #24211c;
+  background: #18181b;
   color: #f6f4f1;
   box-shadow: 0 14px 36px rgb(0 0 0 / 0.32);
   pointer-events: none;

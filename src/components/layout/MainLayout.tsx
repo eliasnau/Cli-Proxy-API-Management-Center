@@ -20,6 +20,7 @@ import { authFilesApi, pluginsApi } from '@/services/api';
 import {
   IconSidebarAuthFiles,
   IconSidebarConfig,
+  IconSidebarDevices,
   IconSidebarDashboard,
   IconSidebarLogs,
   IconSidebarOauth,
@@ -62,6 +63,7 @@ const sidebarIcons: Record<string, ReactNode> = {
   authFiles: <IconSidebarAuthFiles size={18} />,
   oauth: <IconSidebarOauth size={18} />,
   quota: <IconSidebarQuota size={18} />,
+  devices: <IconSidebarDevices size={18} />,
   routing: <IconSidebarRouting size={18} />,
   plugins: <IconSidebarPlugins size={18} />,
   pluginStore: <IconSidebarStore size={18} />,
@@ -650,6 +652,12 @@ export function MainLayout() {
       id: 'observe',
       labelKey: 'nav_groups.observe',
       items: [
+        {
+          path: '/devices',
+          labelKey: 'nav.devices',
+          metaKey: 'nav_meta.devices',
+          icon: sidebarIcons.devices,
+        },
         {
           path: '/quota',
           labelKey: 'nav.quota_management',

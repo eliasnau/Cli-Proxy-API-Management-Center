@@ -556,3 +556,13 @@ export function IconLock({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
+
+export function IconSidebarDevices({ size = 20, ...props }: IconProps) {
+  return (
+    <svg {...baseSvgProps} width={size} height={size} {...props}>
+      <rect width="14" height="10" x="2" y="4" rx="2" />
+      <path d="M1 18h12" />
+      <rect width="6" height="11" x="16" y="9" rx="1.5" />
+    </svg>
+  );
+}
