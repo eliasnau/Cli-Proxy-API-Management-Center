@@ -4,8 +4,27 @@ import { isRecord } from '@/utils/helpers';
 export interface DeviceModelUsage {
   model: string;
   requests: number;
+  failedRequests: number;
+  /** Includes cache reads and writes. */
   inputTokens: number;
   outputTokens: number;
+  cacheReadTokens: number;
+  cacheWriteTokens: number;
+  costUsd: number;
+}
+
+export interface DeviceDayUsage {
+  /** "YYYY-MM-DD" */
+  day: string;
+  /** False when the backend only recorded the day's cost (older data). */
+  detailed: boolean;
+  requests: number;
+  failedRequests: number;
+  /** Uncached input only, like the month-level field. */
+  inputTokens: number;
+  outputTokens: number;
+  cacheReadTokens: number;
+  cacheWriteTokens: number;
   costUsd: number;
 }
 
@@ -19,7 +38,23 @@ export interface DeviceMonthUsage {
   costUsd: number;
   byModel: DeviceModelUsage[];
   /** Sorted ascending by day ("YYYY-MM-DD"). */
-  byDay: { day: string; costUsd: number }[];
+  byDay: DeviceDayUsage[];
+}
+
+export interface DeviceMonthReportEntry {
+  id: string;
+  name: string;
+  monthlyLimitUsd: number;
+  disabled: boolean;
+  usage: DeviceMonthUsage;
+}
+
+export interface DeviceUsageReport {
+  month: string;
+  currentMonth: string;
+  /** Newest first; always contains the current month. */
+  months: string[];
+  devices: DeviceMonthReportEntry[];
 }
 
 export interface Device {
@@ -63,10 +98,27 @@ const num = (value: unknown): number => {
 
 const str = (value: unknown): string => (typeof value === 'string' ? value : '');
 
+const normalizeDay = (day: string, cost: unknown, detail: unknown): DeviceDayUsage => {
+  const d = isRecord(detail) ? detail : null;
+  return {
+    day,
+    detailed: d !== null,
+    requests: num(d?.requests),
+    failedRequests: num(d?.failed_requests),
+    inputTokens: num(d?.input_tokens),
+    outputTokens: num(d?.output_tokens),
+    cacheReadTokens: num(d?.cache_read_tokens),
+    cacheWriteTokens: num(d?.cache_write_tokens),
+    costUsd: d ? num(d.cost_usd) : num(cost),
+  };
+};
+
 export const normalizeMonthUsage = (value: unknown): DeviceMonthUsage => {
   const raw = isRecord(value) ? value : {};
   const byModelRaw = isRecord(raw.by_model) ? raw.by_model : {};
   const byDayRaw = isRecord(raw.by_day) ? raw.by_day : {};
+  const daysRaw = isRecord(raw.days) ? raw.days : {};
+  const dayKeys = new Set([...Object.keys(byDayRaw), ...Object.keys(daysRaw)]);
   return {
     requests: num(raw.requests),
     failedRequests: num(raw.failed_requests),
@@ -81,14 +133,17 @@ export const normalizeMonthUsage = (value: unknown): DeviceMonthUsage => {
         return {
           model,
           requests: num(m.requests),
+          failedRequests: num(m.failed_requests),
           inputTokens: num(m.input_tokens),
           outputTokens: num(m.output_tokens),
+          cacheReadTokens: num(m.cache_read_tokens),
+          cacheWriteTokens: num(m.cache_write_tokens),
           costUsd: num(m.cost_usd),
         };
       })
       .sort((a, b) => b.costUsd - a.costUsd),
-    byDay: Object.entries(byDayRaw)
-      .map(([day, cost]) => ({ day, costUsd: num(cost) }))
+    byDay: [...dayKeys]
+      .map((day) => normalizeDay(day, byDayRaw[day], daysRaw[day]))
       .sort((a, b) => a.day.localeCompare(b.day)),
   };
 };
@@ -105,9 +160,35 @@ export const normalizeDevice = (value: unknown): Device | null => {
     disabled: value.disabled === true,
     note: str(value.note),
     createdAt: str(value.created_at),
-    lastUsedAt: str(value.last_used_at).startsWith('0001-') ? null : str(value.last_used_at) || null,
+    lastUsedAt: str(value.last_used_at).startsWith('0001-')
+      ? null
+      : str(value.last_used_at) || null,
     month: str(value.month),
     usage: normalizeMonthUsage(value.usage),
+  };
+};
+
+const normalizeReport = (value: unknown): DeviceUsageReport => {
+  const raw = isRecord(value) ? value : {};
+  const list = Array.isArray(raw.devices) ? raw.devices : [];
+  const currentMonth = str(raw.current_month);
+  const months = Array.isArray(raw.months) ? raw.months.map(str).filter(Boolean) : [];
+  return {
+    month: str(raw.month) || currentMonth,
+    currentMonth,
+    months: months.length > 0 ? months : currentMonth ? [currentMonth] : [],
+    devices: list.flatMap((entry) => {
+      if (!isRecord(entry) || !str(entry.id)) return [];
+      return [
+        {
+          id: str(entry.id),
+          name: str(entry.name),
+          monthlyLimitUsd: num(entry.monthly_limit_usd),
+          disabled: entry.disabled === true,
+          usage: normalizeMonthUsage(entry.usage),
+        },
+      ];
+    }),
   };
 };
 
@@ -125,9 +206,7 @@ const normalizeRule = (value: unknown): DevicePriceRule | null => {
 };
 
 const normalizeRules = (value: unknown): DevicePriceRule[] =>
-  Array.isArray(value)
-    ? (value.map(normalizeRule).filter(Boolean) as DevicePriceRule[])
-    : [];
+  Array.isArray(value) ? (value.map(normalizeRule).filter(Boolean) as DevicePriceRule[]) : [];
 
 const normalizePricing = (value: unknown): DevicePricing => {
   const raw = isRecord(value) ? value : {};
@@ -168,6 +247,21 @@ export const devicesApi = {
     if (patch.note !== undefined) body.note = patch.note;
     const data = await apiClient.patch<unknown>(`/devices/${encodeURIComponent(id)}`, body);
     return deviceFromResponse(data);
+  },
+
+  /** All devices' usage for one month ("YYYY-MM"); omit for the current month. */
+  async usage(month?: string): Promise<DeviceUsageReport> {
+    const query = month ? `?month=${encodeURIComponent(month)}` : '';
+    return normalizeReport(await apiClient.get<unknown>(`/devices/usage${query}`));
+  },
+
+  /** Every recorded month for one device, newest first. */
+  async history(id: string): Promise<{ month: string; usage: DeviceMonthUsage }[]> {
+    const data = await apiClient.get<unknown>(`/devices/${encodeURIComponent(id)}/history`);
+    const months = isRecord(data) && isRecord(data.months) ? data.months : {};
+    return Object.entries(months)
+      .map(([month, usage]) => ({ month, usage: normalizeMonthUsage(usage) }))
+      .sort((a, b) => b.month.localeCompare(a.month));
   },
 
   remove: (id: string) => apiClient.delete(`/devices/${encodeURIComponent(id)}`),

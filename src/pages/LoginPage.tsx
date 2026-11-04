@@ -14,7 +14,6 @@ import { isSupportedLanguage } from '@/utils/language';
 import { INLINE_LOGO_JPEG } from '@/assets/logoInline';
 import type { ApiError } from '@/types';
 import { LegacyBackendError } from '@/services/api/legacyBackendProbe';
-import { DotMatrixHero } from './login/DotMatrixHero';
 import { LoginForm } from './login/LoginForm';
 import { resolveLoginRedirect } from '@/router/loginRedirect';
 import styles from './LoginPage.module.scss';
@@ -246,20 +245,10 @@ export function LoginPage() {
 
   return (
     <div className={styles.container} data-phase={phase === 'exiting' ? 'exiting' : undefined}>
-      <div className={styles.brandPanel}>
-        <DotMatrixHero />
-      </div>
-
+      {/* 自动登录启动页自带大徽标与品牌名，此时不再渲染语言切换，避免干扰 */}
       <div className={styles.formPanel}>
-        {/* 自动登录启动页自带大徽标与品牌名，此时不再渲染顶栏，避免重复 */}
         {!showSplash && (
           <header className={styles.topBar}>
-            <div className={styles.brandMark}>
-              <img src={INLINE_LOGO_JPEG} alt="" className={styles.brandLogo} />
-              <span className={styles.brandName} title={LOGIN_BRAND_NAME}>
-                {LOGIN_BRAND_NAME}
-              </span>
-            </div>
             <Select
               className={styles.languageSelect}
               dropdownClassName={styles.languageDropdown}
@@ -288,6 +277,12 @@ export function LoginPage() {
             </div>
           ) : (
             <div className={styles.column}>
+              <div className={styles.brandMark}>
+                <img src={INLINE_LOGO_JPEG} alt="" className={styles.brandLogo} />
+                <span className={styles.brandName} title={LOGIN_BRAND_NAME}>
+                  {LOGIN_BRAND_NAME}
+                </span>
+              </div>
               <h1 className={styles.title}>{t('splash.subtitle')}</h1>
               <LoginForm
                 apiBase={apiBase}

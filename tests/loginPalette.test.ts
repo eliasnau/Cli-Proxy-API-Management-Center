@@ -87,17 +87,10 @@ describe('login palette', () => {
     for (const path of [
       'src/pages/LoginPage.module.scss',
       'src/pages/login/LoginForm.module.scss',
-      'src/pages/login/DotMatrixHero.module.scss',
     ]) {
       const css = (await Bun.file(path).text()).replace(/\/\/.*$/gm, '');
       expect(css).not.toMatch(/rgba\(255, 255, 255/);
       expect(css).not.toMatch(/#(?:000000|ffffff|f5f5f4|0a0a0a|111111)\b/i);
     }
-  });
-
-  test('the dot canvas takes its color from the theme and repaints on theme change', async () => {
-    const hero = await Bun.file('src/pages/login/DotMatrixHero.tsx').text();
-    expect(hero).toContain("getPropertyValue('--login-dot-color')");
-    expect(hero).toContain("attributeFilter: ['data-theme']");
   });
 });
