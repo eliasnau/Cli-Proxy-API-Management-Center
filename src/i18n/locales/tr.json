@@ -113,7 +113,8 @@
     "config_management": "Yapılandırma Paneli",
     "logs": "Günlük Görüntüleyici",
     "system_info": "Yönetim Merkezi Bilgisi",
-    "devices": "Kullanım"
+    "devices": "Devices",
+    "usage": "Kullanım"
   },
   "nav_groups": {
     "primary": "Navigation",
@@ -138,7 +139,8 @@
     "logs": "İstek İzleme",
     "config_management": "Ağ Geçidi Yapılandırması",
     "system_info": "Çalışma Zamanı ve Tanılama",
-    "devices": "Anahtarlar ve limitler"
+    "devices": "Anahtarlar ve limitler",
+    "usage": "Spend, tokens & charts"
   },
   "dashboard": {
     "routing_title": "Routing",
@@ -2479,6 +2481,9 @@
     "access_detail_accounts": "Accounts: {{list}}",
     "access_detail_models": "Models: {{list}}",
     "title": "Kullanım",
+    "page_devices_title": "Devices",
+    "page_devices_desc": "One key per device, each with its own monthly limit and account access. Upstream requests are unchanged.",
+    "page_usage_desc": "Spend, tokens and requests across all devices, with projections and per-model detail.",
     "description": "Give each device its own API key and cap how much it can spend per month. Upstream requests are unchanged.",
     "add": "Add device",
     "create": "Create device",

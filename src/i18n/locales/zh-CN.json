@@ -113,7 +113,8 @@
     "config_management": "配置面板",
     "logs": "日志查看",
     "system_info": "中心信息",
-    "devices": "用量"
+    "devices": "Devices",
+    "usage": "用量"
   },
   "nav_groups": {
     "primary": "导航",
@@ -138,7 +139,8 @@
     "logs": "请求追踪与排查",
     "config_management": "网关基础配置",
     "system_info": "运行与诊断信息",
-    "devices": "密钥与消费限额"
+    "devices": "密钥与消费限额",
+    "usage": "Spend, tokens & charts"
   },
   "dashboard": {
     "routing_title": "Routing",
@@ -2477,6 +2479,9 @@
     "access_detail_accounts": "Accounts: {{list}}",
     "access_detail_models": "Models: {{list}}",
     "title": "用量",
+    "page_devices_title": "Devices",
+    "page_devices_desc": "One key per device, each with its own monthly limit and account access. Upstream requests are unchanged.",
+    "page_usage_desc": "Spend, tokens and requests across all devices, with projections and per-model detail.",
     "description": "为每台设备分配独立的 API 密钥并限制每月消费。上游请求保持不变。",
     "add": "添加设备",
     "create": "Create device",

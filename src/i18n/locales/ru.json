@@ -113,7 +113,8 @@
     "config_management": "Панель конфигурации",
     "logs": "Просмотр логов",
     "system_info": "Информация системы",
-    "devices": "Использование"
+    "devices": "Devices",
+    "usage": "Использование"
   },
   "nav_groups": {
     "primary": "Навигация",
@@ -137,7 +138,8 @@
     "logs": "Трассировка запросов",
     "config_management": "Базовая конфигурация шлюза",
     "system_info": "Состояние и диагностика",
-    "devices": "Ключи и лимиты"
+    "devices": "Ключи и лимиты",
+    "usage": "Spend, tokens & charts"
   },
   "dashboard": {
     "routing_title": "Routing",
@@ -2477,6 +2479,9 @@
     "access_badge_models_few": "{{count}} model rules",
     "access_badge_models_many": "{{count}} model rules",
     "title": "Использование",
+    "page_devices_title": "Devices",
+    "page_devices_desc": "One key per device, each with its own monthly limit and account access. Upstream requests are unchanged.",
+    "page_usage_desc": "Spend, tokens and requests across all devices, with projections and per-model detail.",
     "description": "Give each device its own API key and cap how much it can spend per month. Upstream requests are unchanged.",
     "add": "Add device",
     "create": "Create device",

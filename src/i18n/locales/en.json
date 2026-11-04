@@ -113,7 +113,8 @@
     "config_management": "Config",
     "logs": "Logs",
     "system_info": "Info",
-    "devices": "Usage"
+    "devices": "Devices",
+    "usage": "Usage"
   },
   "nav_groups": {
     "primary": "Navigation",
@@ -138,7 +139,8 @@
     "logs": "Request tracing",
     "config_management": "Gateway configuration",
     "system_info": "Runtime & diagnostics",
-    "devices": "Spend, tokens & device keys"
+    "devices": "Device keys, limits & access",
+    "usage": "Spend, tokens & charts"
   },
   "dashboard": {
     "routing_title": "Routing",
@@ -2479,6 +2481,9 @@
     "access_detail_accounts": "Accounts: {{list}}",
     "access_detail_models": "Models: {{list}}",
     "title": "Usage",
+    "page_devices_title": "Devices",
+    "page_devices_desc": "One key per device, each with its own monthly limit and account access. Upstream requests are unchanged.",
+    "page_usage_desc": "Spend, tokens and requests across all devices, with projections and per-model detail.",
     "description": "Spend, tokens and requests per device key, with monthly limits and projections. Upstream requests are unchanged.",
     "add": "Add device",
     "create": "Create device",

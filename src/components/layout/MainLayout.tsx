@@ -21,6 +21,7 @@ import {
   IconSidebarAuthFiles,
   IconSidebarConfig,
   IconSidebarDevices,
+  IconSidebarUsage,
   IconSidebarDashboard,
   IconSidebarLogs,
   IconSidebarOauth,
@@ -62,6 +63,7 @@ const sidebarIcons: Record<string, ReactNode> = {
   oauth: <IconSidebarOauth size={18} />,
   quota: <IconSidebarQuota size={18} />,
   devices: <IconSidebarDevices size={18} />,
+  usage: <IconSidebarUsage size={18} />,
   routing: <IconSidebarRouting size={18} />,
   plugins: <IconSidebarPlugins size={18} />,
   pluginStore: <IconSidebarStore size={18} />,
@@ -633,6 +635,12 @@ export function MainLayout() {
       icon: sidebarIcons.dashboard,
     },
     {
+      path: '/usage',
+      labelKey: 'nav.usage',
+      metaKey: 'nav_meta.usage',
+      icon: sidebarIcons.usage,
+    },
+    {
       path: '/devices',
       labelKey: 'nav.devices',
       metaKey: 'nav_meta.devices',
@@ -654,10 +662,10 @@ export function MainLayout() {
       icon: sidebarIcons.accounts,
     },
     {
-      path: '/config',
-      labelKey: 'nav.config_management',
-      metaKey: 'nav_meta.config_management',
-      icon: sidebarIcons.config,
+      path: '/quota',
+      labelKey: 'nav.quota_management',
+      metaKey: 'nav_meta.quota_management',
+      icon: sidebarIcons.quota,
     },
     {
       path: '/logs',
@@ -670,10 +678,10 @@ export function MainLayout() {
   // Rarely used pages live in a small "More" group at the bottom of the sidebar.
   const secondaryNavItems: SidebarNavLinkItem[] = [
     {
-      path: '/quota',
-      labelKey: 'nav.quota_management',
-      metaKey: 'nav_meta.quota_management',
-      icon: sidebarIcons.quota,
+      path: '/config',
+      labelKey: 'nav.config_management',
+      metaKey: 'nav_meta.config_management',
+      icon: sidebarIcons.config,
     },
     ...(supportsPlugin
       ? [
@@ -881,9 +889,7 @@ export function MainLayout() {
         key={item.path}
         to={item.path}
         end={item.path === '/'}
-        className={() =>
-          `${className} ${isNavItemActive(item, location.pathname) ? 'active' : ''}`
-        }
+        className={() => `${className} ${isNavItemActive(item, location.pathname) ? 'active' : ''}`}
         onClick={() => {
           focusedRailItemRef.current = null;
           setSidebarOpen(false);

@@ -34,7 +34,8 @@ const createMainRoutes = (supportsPlugin: boolean) => [
   { path: '/oauth', element: <Navigate to="/accounts?tab=add" replace /> },
   { path: '/routing', element: <RoutingPage /> },
   { path: '/quota', element: <QuotaPage /> },
-  { path: '/devices', element: <DevicesPage /> },
+  { path: '/usage', element: <DevicesPage view="usage" /> },
+  { path: '/devices', element: <DevicesPage view="devices" /> },
   ...(supportsPlugin
     ? [
         { path: '/plugin-pages/:pluginId/:menuIndex', element: <PluginResourcePage /> },

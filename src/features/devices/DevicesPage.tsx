@@ -85,7 +85,8 @@ interface Entry {
   slot: number | null;
 }
 
-export function DevicesPage() {
+export function DevicesPage({ view = 'usage' }: { view?: 'usage' | 'devices' }) {
+  const isUsage = view === 'usage';
   const { t, i18n } = useTranslation();
   const connected = useAuthStore((state) => state.connectionStatus === 'connected');
   const apiBase = useAuthStore((state) => state.apiBase);
@@ -346,8 +347,12 @@ export function DevicesPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <div className={styles.headerText}>
-          <h1 className={styles.title}>{t('devices.title')}</h1>
-          <p className={styles.description}>{t('devices.description')}</p>
+          <h1 className={styles.title}>
+            {isUsage ? t('devices.title') : t('devices.page_devices_title')}
+          </h1>
+          <p className={styles.description}>
+            {isUsage ? t('devices.page_usage_desc') : t('devices.page_devices_desc')}
+          </p>
         </div>
         <div className={styles.headerActions}>
           {monthOptions.length > 0 ? (
@@ -364,243 +369,260 @@ export function DevicesPage() {
               className={styles.monthSelect}
             />
           ) : null}
-          <Button variant="secondary" size="sm" onClick={() => setPricingOpen(true)}>
-            {t('devices.pricing')}
-          </Button>
-          <Button size="sm" onClick={() => openDraft(emptyDraft)} disabled={!connected}>
-            <IconPlus size={16} />
-            {t('devices.add')}
-          </Button>
-        </div>
-      </header>
-
-      <section className={styles.kpis} aria-label={t('devices.kpis_aria')}>
-        <Kpi
-          primary
-          label={window.isCurrent ? t('devices.kpi_spend_mtd') : t('devices.kpi_spend')}
-          value={formatUsd(kpis.spend)}
-          loading={firstLoad}
-          delta={kpis.spendChange}
-          deltaHint={window.isCurrent ? t('devices.vs_same_point') : t('devices.vs_prev_month')}
-        />
-        <Kpi
-          label={window.isCurrent ? t('devices.kpi_projected') : t('devices.kpi_final')}
-          value={formatUsd(kpis.projected)}
-          loading={firstLoad}
-          hint={
-            kpis.limits !== null && kpis.limits > 0
-              ? t('devices.of_total_limits', {
-                  pct: formatPercent(kpis.projected / kpis.limits, 0),
-                  limit: formatUsd(kpis.limits),
-                })
-              : kpis.prevFull !== null
-                ? t('devices.prev_month_total', { value: formatUsd(kpis.prevFull) })
-                : t('devices.run_rate_hint')
-          }
-        />
-        <Kpi
-          label={t('devices.kpi_requests')}
-          value={formatCount(kpis.requests)}
-          loading={firstLoad}
-          delta={kpis.requestsChange}
-          deltaHint={t('devices.vs_prev_month')}
-          hint={
-            kpis.requestsChange === null
-              ? t('devices.per_day', {
-                  value: formatCount(Math.round(kpis.requests / Math.max(1, window.elapsedDays))),
-                })
-              : undefined
-          }
-        />
-        <Kpi
-          label={t('devices.kpi_success')}
-          value={formatPercent(kpis.success)}
-          loading={firstLoad}
-          hint={t('devices.failed_count', { count: total.failedRequests })}
-        />
-        <Kpi
-          label={t('devices.kpi_tokens')}
-          value={formatTokens(kpis.tokens)}
-          loading={firstLoad}
-          hint={t('devices.tokens_split', {
-            input: formatTokens(total.inputTokens + total.cacheReadTokens + total.cacheWriteTokens),
-            output: formatTokens(total.outputTokens),
-          })}
-        />
-        <Kpi
-          label={t('devices.kpi_cache_hit')}
-          value={formatPercent(kpis.cacheHit)}
-          loading={firstLoad}
-          hint={t('devices.cache_read_hint', { value: formatTokens(total.cacheReadTokens) })}
-        />
-        <Kpi
-          label={t('devices.kpi_avg_cost')}
-          value={kpis.avgCost === null ? '—' : formatUsd(kpis.avgCost)}
-          loading={firstLoad}
-          hint={
-            kpis.tokens > 0
-              ? t('devices.per_million', { value: formatUsd((total.costUsd / kpis.tokens) * 1e6) })
-              : undefined
-          }
-        />
-      </section>
-
-      <section className={styles.panel}>
-        <div className={styles.panelHead}>
-          <div>
-            <h2 className={styles.panelTitle}>{t('devices.chart_title')}</h2>
-            <p className={styles.panelSub}>{t('devices.chart_sub', { month: monthLabel })}</p>
-          </div>
-          <div className={styles.segmented} role="group" aria-label={t('devices.view_mode')}>
-            {(['chart', 'table'] as const).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                aria-pressed={chartView === mode}
-                className={chartView === mode ? styles.segActive : undefined}
-                onClick={() => setChartView(mode)}
-              >
-                {t(`devices.view_${mode}`)}
-              </button>
-            ))}
-          </div>
-        </div>
-        {series.length > 0 ? (
-          <ul className={styles.legend}>
-            {series.map((s) => (
-              <li key={s.key}>
-                <span className={styles.swatch} style={{ background: seriesColor(s.slot) }} />
-                <span className={styles.legendName}>{s.name}</span>
-                <span className={styles.legendValue}>{formatUsd(s.total)}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        {firstLoad ? (
-          <div className={styles.chartSkeleton} />
-        ) : chartView === 'chart' ? (
-          <div className={styles.chartArea}>
-            <SpendChart
-              series={series}
-              window={window}
-              requests={seriesRequests}
-              ariaLabel={t('devices.chart_aria', {
-                month: monthLabel,
-                total: formatUsd(total.costUsd),
-              })}
-            />
-            {!hasSpend ? (
-              <div className={styles.chartEmpty}>
-                <strong>{t('devices.chart_empty_title')}</strong>
-                <span>
-                  {devices.length === 0
-                    ? t('devices.chart_empty_no_devices')
-                    : t('devices.chart_empty_desc')}
-                </span>
-              </div>
-            ) : null}
-          </div>
-        ) : (
-          <DailyMatrix series={series} window={window} />
-        )}
-      </section>
-
-      <div className={styles.split}>
-        <section className={styles.panel}>
-          <div className={styles.panelHead}>
-            <div>
-              <h2 className={styles.panelTitle}>{t('devices.token_mix')}</h2>
-              <p className={styles.panelSub}>{t('devices.token_mix_sub')}</p>
-            </div>
-          </div>
-          <TokenMix usage={total} />
-        </section>
-        <section className={styles.panel}>
-          <div className={styles.panelHead}>
-            <div>
-              <h2 className={styles.panelTitle}>{t('devices.share_title')}</h2>
-              <p className={styles.panelSub}>
-                {t('devices.share_sub', { total: formatUsd(total.costUsd) })}
-              </p>
-            </div>
-          </div>
-          <ShareList entries={entries} total={total.costUsd} />
-        </section>
-      </div>
-
-      <section className={styles.panel}>
-        <div className={styles.panelHead}>
-          <div>
-            <h2 className={styles.panelTitle}>{t('devices.models_title')}</h2>
-            <p className={styles.panelSub}>
-              {t('devices.models_sub', { count: total.byModel.length })}
-            </p>
-          </div>
-        </div>
-        <ModelTable usage={total} />
-      </section>
-
-      <section className={styles.devicesSection}>
-        <div className={styles.sectionHead}>
-          <h2 className={styles.panelTitle}>{t('devices.devices_title')}</h2>
-          <span className={styles.countPill}>{devices.length}</span>
-        </div>
-
-        {firstLoad ? (
-          <div className={styles.list}>
-            {[0, 1, 2].map((i) => (
-              <div key={i} className={styles.skeleton} />
-            ))}
-          </div>
-        ) : devices.length === 0 ? (
-          <div className={styles.emptyCard}>
-            <div className={styles.emptyIcon} aria-hidden="true">
-              <IconDollarSign size={20} />
-            </div>
-            <strong>{t('devices.empty_title')}</strong>
-            <p>{t('devices.empty_desc')}</p>
-            <Button size="sm" onClick={() => openDraft(emptyDraft)}>
+          {isUsage ? (
+            <Button variant="secondary" size="sm" onClick={() => setPricingOpen(true)}>
+              {t('devices.pricing')}
+            </Button>
+          ) : (
+            <Button size="sm" onClick={() => openDraft(emptyDraft)} disabled={!connected}>
               <IconPlus size={16} />
               {t('devices.add')}
             </Button>
+          )}
+        </div>
+      </header>
+
+      {isUsage ? (
+        <>
+          <section className={styles.kpis} aria-label={t('devices.kpis_aria')}>
+            <Kpi
+              primary
+              label={window.isCurrent ? t('devices.kpi_spend_mtd') : t('devices.kpi_spend')}
+              value={formatUsd(kpis.spend)}
+              loading={firstLoad}
+              delta={kpis.spendChange}
+              deltaHint={window.isCurrent ? t('devices.vs_same_point') : t('devices.vs_prev_month')}
+            />
+            <Kpi
+              label={window.isCurrent ? t('devices.kpi_projected') : t('devices.kpi_final')}
+              value={formatUsd(kpis.projected)}
+              loading={firstLoad}
+              hint={
+                kpis.limits !== null && kpis.limits > 0
+                  ? t('devices.of_total_limits', {
+                      pct: formatPercent(kpis.projected / kpis.limits, 0),
+                      limit: formatUsd(kpis.limits),
+                    })
+                  : kpis.prevFull !== null
+                    ? t('devices.prev_month_total', { value: formatUsd(kpis.prevFull) })
+                    : t('devices.run_rate_hint')
+              }
+            />
+            <Kpi
+              label={t('devices.kpi_requests')}
+              value={formatCount(kpis.requests)}
+              loading={firstLoad}
+              delta={kpis.requestsChange}
+              deltaHint={t('devices.vs_prev_month')}
+              hint={
+                kpis.requestsChange === null
+                  ? t('devices.per_day', {
+                      value: formatCount(
+                        Math.round(kpis.requests / Math.max(1, window.elapsedDays))
+                      ),
+                    })
+                  : undefined
+              }
+            />
+            <Kpi
+              label={t('devices.kpi_success')}
+              value={formatPercent(kpis.success)}
+              loading={firstLoad}
+              hint={t('devices.failed_count', { count: total.failedRequests })}
+            />
+            <Kpi
+              label={t('devices.kpi_tokens')}
+              value={formatTokens(kpis.tokens)}
+              loading={firstLoad}
+              hint={t('devices.tokens_split', {
+                input: formatTokens(
+                  total.inputTokens + total.cacheReadTokens + total.cacheWriteTokens
+                ),
+                output: formatTokens(total.outputTokens),
+              })}
+            />
+            <Kpi
+              label={t('devices.kpi_cache_hit')}
+              value={formatPercent(kpis.cacheHit)}
+              loading={firstLoad}
+              hint={t('devices.cache_read_hint', { value: formatTokens(total.cacheReadTokens) })}
+            />
+            <Kpi
+              label={t('devices.kpi_avg_cost')}
+              value={kpis.avgCost === null ? '—' : formatUsd(kpis.avgCost)}
+              loading={firstLoad}
+              hint={
+                kpis.tokens > 0
+                  ? t('devices.per_million', {
+                      value: formatUsd((total.costUsd / kpis.tokens) * 1e6),
+                    })
+                  : undefined
+              }
+            />
+          </section>
+
+          <section className={styles.panel}>
+            <div className={styles.panelHead}>
+              <div>
+                <h2 className={styles.panelTitle}>{t('devices.chart_title')}</h2>
+                <p className={styles.panelSub}>{t('devices.chart_sub', { month: monthLabel })}</p>
+              </div>
+              <div className={styles.segmented} role="group" aria-label={t('devices.view_mode')}>
+                {(['chart', 'table'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    aria-pressed={chartView === mode}
+                    className={chartView === mode ? styles.segActive : undefined}
+                    onClick={() => setChartView(mode)}
+                  >
+                    {t(`devices.view_${mode}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {series.length > 0 ? (
+              <ul className={styles.legend}>
+                {series.map((s) => (
+                  <li key={s.key}>
+                    <span className={styles.swatch} style={{ background: seriesColor(s.slot) }} />
+                    <span className={styles.legendName}>{s.name}</span>
+                    <span className={styles.legendValue}>{formatUsd(s.total)}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {firstLoad ? (
+              <div className={styles.chartSkeleton} />
+            ) : chartView === 'chart' ? (
+              <div className={styles.chartArea}>
+                <SpendChart
+                  series={series}
+                  window={window}
+                  requests={seriesRequests}
+                  ariaLabel={t('devices.chart_aria', {
+                    month: monthLabel,
+                    total: formatUsd(total.costUsd),
+                  })}
+                />
+                {!hasSpend ? (
+                  <div className={styles.chartEmpty}>
+                    <strong>{t('devices.chart_empty_title')}</strong>
+                    <span>
+                      {devices.length === 0
+                        ? t('devices.chart_empty_no_devices')
+                        : t('devices.chart_empty_desc')}
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <DailyMatrix series={series} window={window} />
+            )}
+          </section>
+
+          <div className={styles.split}>
+            <section className={styles.panel}>
+              <div className={styles.panelHead}>
+                <div>
+                  <h2 className={styles.panelTitle}>{t('devices.token_mix')}</h2>
+                  <p className={styles.panelSub}>{t('devices.token_mix_sub')}</p>
+                </div>
+              </div>
+              <TokenMix usage={total} />
+            </section>
+            <section className={styles.panel}>
+              <div className={styles.panelHead}>
+                <div>
+                  <h2 className={styles.panelTitle}>{t('devices.share_title')}</h2>
+                  <p className={styles.panelSub}>
+                    {t('devices.share_sub', { total: formatUsd(total.costUsd) })}
+                  </p>
+                </div>
+              </div>
+              <ShareList entries={entries} total={total.costUsd} />
+            </section>
           </div>
-        ) : (
-          <div className={styles.list}>
-            {entries.map((entry) => (
-              <DeviceRow
-                key={entry.device.id}
-                entry={entry}
-                window={window}
-                accounts={accounts ?? []}
-                revealed={Boolean(revealed[entry.device.id])}
-                expanded={expanded === entry.device.id}
-                onToggleExpand={() =>
-                  setExpanded((cur) => (cur === entry.device.id ? null : entry.device.id))
-                }
-                onToggleReveal={() =>
-                  setRevealed((r) => ({ ...r, [entry.device.id]: !r[entry.device.id] }))
-                }
-                onCopy={() => void copy(entry.device.key)}
-                onToggleEnabled={(value) => void toggleDisabled(entry.device, value)}
-                onEdit={() =>
-                  openDraft({
-                    id: entry.device.id,
-                    name: entry.device.name,
-                    limit: entry.device.monthlyLimitUsd ? String(entry.device.monthlyLimitUsd) : '',
-                    note: entry.device.note,
-                    allowedProviders: entry.device.allowedProviders,
-                    allowedAuths: entry.device.allowedAuths,
-                    models: entry.device.allowedModels.join(', '),
-                  })
-                }
-                onRotate={() => rotate(entry.device)}
-                onDelete={() => remove(entry.device)}
-                onReset={() => reset(entry.device)}
-              />
-            ))}
+
+          <section className={styles.panel}>
+            <div className={styles.panelHead}>
+              <div>
+                <h2 className={styles.panelTitle}>{t('devices.models_title')}</h2>
+                <p className={styles.panelSub}>
+                  {t('devices.models_sub', { count: total.byModel.length })}
+                </p>
+              </div>
+            </div>
+            <ModelTable usage={total} />
+          </section>
+        </>
+      ) : null}
+
+      {!isUsage ? (
+        <section className={styles.devicesSection}>
+          <div className={styles.sectionHead}>
+            <h2 className={styles.panelTitle}>{t('devices.devices_title')}</h2>
+            <span className={styles.countPill}>{devices.length}</span>
           </div>
-        )}
-      </section>
+
+          {firstLoad ? (
+            <div className={styles.list}>
+              {[0, 1, 2].map((i) => (
+                <div key={i} className={styles.skeleton} />
+              ))}
+            </div>
+          ) : devices.length === 0 ? (
+            <div className={styles.emptyCard}>
+              <div className={styles.emptyIcon} aria-hidden="true">
+                <IconDollarSign size={20} />
+              </div>
+              <strong>{t('devices.empty_title')}</strong>
+              <p>{t('devices.empty_desc')}</p>
+              <Button size="sm" onClick={() => openDraft(emptyDraft)}>
+                <IconPlus size={16} />
+                {t('devices.add')}
+              </Button>
+            </div>
+          ) : (
+            <div className={styles.list}>
+              {entries.map((entry) => (
+                <DeviceRow
+                  key={entry.device.id}
+                  entry={entry}
+                  window={window}
+                  accounts={accounts ?? []}
+                  revealed={Boolean(revealed[entry.device.id])}
+                  expanded={expanded === entry.device.id}
+                  onToggleExpand={() =>
+                    setExpanded((cur) => (cur === entry.device.id ? null : entry.device.id))
+                  }
+                  onToggleReveal={() =>
+                    setRevealed((r) => ({ ...r, [entry.device.id]: !r[entry.device.id] }))
+                  }
+                  onCopy={() => void copy(entry.device.key)}
+                  onToggleEnabled={(value) => void toggleDisabled(entry.device, value)}
+                  onEdit={() =>
+                    openDraft({
+                      id: entry.device.id,
+                      name: entry.device.name,
+                      limit: entry.device.monthlyLimitUsd
+                        ? String(entry.device.monthlyLimitUsd)
+                        : '',
+                      note: entry.device.note,
+                      allowedProviders: entry.device.allowedProviders,
+                      allowedAuths: entry.device.allowedAuths,
+                      models: entry.device.allowedModels.join(', '),
+                    })
+                  }
+                  onRotate={() => rotate(entry.device)}
+                  onDelete={() => remove(entry.device)}
+                  onReset={() => reset(entry.device)}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      ) : null}
 
       <Modal
         open={draft !== null}
